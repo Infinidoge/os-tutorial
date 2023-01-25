@@ -5,7 +5,7 @@
 #include "../kernel/util.h"
 
 void init_keyboard() {
-   register_interrupt_handler(IRQ1, keyboard_callback); 
+   register_interrupt_handler(IRQ1, keyboard_callback);
 }
 
 void print_letter(u8 scancode) {
@@ -88,24 +88,24 @@ void print_letter(u8 scancode) {
         case 0x19:
             kprint("P");
             break;
-		case 0x1A:
-			kprint("[");
-			break;
-		case 0x1B:
-			kprint("]");
-			break;
-		case 0x1C:
-			kprint("ENTER");
-			break;
-		case 0x1D:
-			kprint("LCtrl");
-			break;
-		case 0x1E:
-			kprint("A");
-			break;
-		case 0x1F:
-			kprint("S");
-			break;
+        case 0x1A:
+            kprint("[");
+            break;
+        case 0x1B:
+            kprint("]");
+            break;
+        case 0x1C:
+            kprint("ENTER");
+            break;
+        case 0x1D:
+            kprint("LCtrl");
+            break;
+        case 0x1E:
+            kprint("A");
+            break;
+        case 0x1F:
+            kprint("S");
+            break;
         case 0x20:
             kprint("D");
             break;
@@ -136,24 +136,24 @@ void print_letter(u8 scancode) {
         case 0x29:
             kprint("`");
             break;
-		case 0x2A:
-			kprint("LShift");
-			break;
-		case 0x2B:
-			kprint("\\");
-			break;
-		case 0x2C:
-			kprint("Z");
-			break;
-		case 0x2D:
-			kprint("X");
-			break;
-		case 0x2E:
-			kprint("C");
-			break;
-		case 0x2F:
-			kprint("V");
-			break;
+        case 0x2A:
+            kprint("LShift");
+            break;
+        case 0x2B:
+            kprint("\\");
+            break;
+        case 0x2C:
+            kprint("Z");
+            break;
+        case 0x2D:
+            kprint("X");
+            break;
+        case 0x2E:
+            kprint("C");
+            break;
+        case 0x2F:
+            kprint("V");
+            break;
         case 0x30:
             kprint("B");
             break;
@@ -185,7 +185,7 @@ void print_letter(u8 scancode) {
             kprint("Spc");
             break;
         default:
-            /* 'keuyp' event corresponds to the 'keydown' + 0x80 
+            /* 'keuyp' event corresponds to the 'keydown' + 0x80
              * it may still be a scancode we haven't implemented yet, or
              * maybe a control/escape sequence */
             if (scancode <= 0x7f) {

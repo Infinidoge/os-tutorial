@@ -49,7 +49,7 @@ void kprint(char *message) {
 
 
 /**
- * Innermost print function for our kernel, directly accesses the video memory 
+ * Innermost print function for our kernel, directly accesses the video memory
  *
  * If 'col' and 'row' are negative, we will print at current cursor location
  * If 'attr' is zero it will use 'white on black' as default

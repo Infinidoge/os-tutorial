@@ -26,7 +26,7 @@ void _start() {
 
     /* Let's write on the current cursor position, we already know how
      * to do that */
-    char *vga = (char *) 0xb8000;
-    vga[offset_from_vga] = 'X'; 
-    vga[offset_from_vga+1] = 0x0f; /* White text on black background */
+    char *vga = (char *)0xb8000;
+    vga[offset_from_vga] = 'X';
+    vga[offset_from_vga + 1] = 0x0f; /* White text on black background */
 }

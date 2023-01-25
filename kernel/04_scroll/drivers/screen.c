@@ -50,7 +50,7 @@ void kprint(char *message) {
 
 
 /**
- * Innermost print function for our kernel, directly accesses the video memory 
+ * Innermost print function for our kernel, directly accesses the video memory
  *
  * If 'col' and 'row' are negative, we will print at current cursor location
  * If 'attr' is zero it will use 'white on black' as default
@@ -84,7 +84,7 @@ int print_char(char c, int col, int row, char attr) {
     /* Check if the offset is over screen size and scroll */
     if (offset >= MAX_ROWS * MAX_COLS * 2) {
         int i;
-        for (i = 1; i < MAX_ROWS; i++) 
+        for (i = 1; i < MAX_ROWS; i++)
             memory_copy( (char *) (get_offset(0, i) + VIDEO_ADDRESS),
                         (char *) (get_offset(0, i-1) + VIDEO_ADDRESS),
                         MAX_COLS * 2);
