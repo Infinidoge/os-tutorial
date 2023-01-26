@@ -1,6 +1,6 @@
+#include "kernel.h"
 #include "../cpu/isr.h"
 #include "../drivers/screen.h"
-#include "kernel.h"
 #include "../libc/string.h"
 
 void _start() {
@@ -8,7 +8,7 @@ void _start() {
     irq_install();
 
     kprint("Type something, it will go through the kernel\n"
-        "Type END to halt the CPU\n> ");
+           "Type END to halt the CPU\n> ");
 }
 
 void user_input(char *input) {

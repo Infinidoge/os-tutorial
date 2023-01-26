@@ -1,7 +1,7 @@
+#include "../cpu/idt.h"
+#include "../cpu/isr.h"
 #include "../drivers/screen.h"
 #include "util.h"
-#include "../cpu/isr.h"
-#include "../cpu/idt.h"
 
 void _start() {
     isr_install();

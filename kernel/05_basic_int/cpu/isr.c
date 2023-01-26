@@ -1,7 +1,7 @@
 #include "isr.h"
-#include "idt.h"
 #include "../drivers/screen.h"
 #include "../kernel/util.h"
+#include "idt.h"
 
 /* Can't do this with a loop because we need the address
  * of the function names */
@@ -78,7 +78,7 @@ char *exception_messages[] = {
     "Reserved",
     "Reserved",
     "Reserved",
-    "Reserved"
+    "Reserved",
 };
 
 void isr_handler(registers_t r) {
