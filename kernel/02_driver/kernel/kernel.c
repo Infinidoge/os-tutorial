@@ -11,6 +11,9 @@ void _start() {
     port_byte_out(0x3d4, 15); /* requesting low byte */
     position += port_byte_in(0x3d5);
 
+    position += 80 * 2; // Down 2 lines
+    position += 10;     // Right 10 columns
+
     /* VGA 'cells' consist of the character and its control data
      * e.g. 'white on black background', 'red text on white bg', etc */
     int offset_from_vga = position * 2;
