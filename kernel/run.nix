@@ -29,7 +29,7 @@ in
   gdb = writeScriptBin "gdb" ''
     ${tmp}
     cp ${drv}/kernel.elf .
-    cp -r ${drv.src}/kernel .
+    cp -r ${drv.src}/* .
     ${lib.getExe gdb} -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
   '';
 }
