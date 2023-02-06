@@ -10,9 +10,11 @@ stdenvNoCC.mkDerivation {
 
   preferLocalBuild = true;
 
-  patches = [ ./makefile.patch ];
-
   nativeBuildInputs = [ gcc binutils nasm ];
+
+  postPatch = ''
+    cp ${./Makefile} Makefile
+  '';
 
   buildPhase = ''
     make os-image.bin
