@@ -1,12 +1,18 @@
-{ stdenv, nasm, name, src }:
-stdenv.mkDerivation {
+{ stdenvNoCC
+, gcc
+, binutils
+, nasm
+, name
+, src
+}:
+stdenvNoCC.mkDerivation {
   inherit name src;
 
   preferLocalBuild = true;
 
   patches = [ ./makefile.patch ];
 
-  nativeBuildInputs = [ nasm ];
+  nativeBuildInputs = [ gcc binutils nasm ];
 
   buildPhase = ''
     make os-image.bin
