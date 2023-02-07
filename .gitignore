@@ -1,7 +1,20 @@
-result
-.direnv
-
+.DS_Store
+.idea
 *.log
 tmp/
 
+# Nix
+result
+.direnv
 
+# Python
+__pycache__/
+
+# Rust
+debug/
+target/
+Cargo.lock
+**/*.rs.bk
+
+# C
+*.out
