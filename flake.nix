@@ -19,8 +19,8 @@
           name = "nixpkgs-old-patched";
           src = nixpkgs-old;
           patches = [
-            ./fix-binutils-priority.patch
-            ./use-binutilsCross-in-gcc.patch
+            ./nix/fix-binutils-priority.patch
+            ./nix/use-binutilsCross-in-gcc.patch
           ];
         };
 
@@ -61,7 +61,7 @@
             kernelPkgs = lib.mapAttrs'
               (name: _: {
                 inherit name;
-                value = pkgs.callPackage ./kernel/kernel.nix {
+                value = pkgs.callPackage ./nix/kernel.nix {
                   inherit name gcc binutils;
                   src = ./kernel + "/${name}";
                 };
@@ -75,7 +75,7 @@
             kernelAppsPre = lib.mapAttrs'
               (name: _: {
                 inherit name;
-                value = pkgs.callPackage ./kernel/run.nix {
+                value = pkgs.callPackage ./nix/run.nix {
                   drv = self.packages.${system}.${name};
                   inherit gdb;
                 };
