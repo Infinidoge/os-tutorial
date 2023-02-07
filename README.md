@@ -21,3 +21,8 @@ Finally, for easy running, each of the kernel folders also have a series of run 
 - `name-debug` runs the kernel in QEMU using curses, with the `gdb` target enabled
 - `name-gdb` runs `gdb` with the kernel elf, kernel sources, etc, included. Automatically targets the `gdb` host from `name-debug`
 - `name` is an alias to `name-curses`
+
+## Notes
+
+This flake only supports building on `x86_64-linux` out of the box.
+Edit `flake.nix` if you are using another type of system.
