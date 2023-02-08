@@ -197,14 +197,6 @@ void print_letter(u8 scancode) {
     }
 }
 
-static void print_letter(u8 scancode) {
-    if (scancode > SC_MAX) {
-        kprint("Unknown scancode");
-    } else {
-        kprint(sc_name[(int)scancode]);
-    }
-}
-
 static void keyboard_callback(registers_t regs) {
     /* The PIC leaves us the scancode in port 0x60 */
     u8 scancode = port_byte_in(0x60);
