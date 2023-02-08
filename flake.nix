@@ -4,85 +4,58 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-
-    nixpkgs-old.url = "github:NixOS/nixpkgs/63c7b4f9a7844f0bc84d008b810375eb0fba6b2f";
-    nixpkgs-old.flake = false;
   };
 
-  outputs = inputs@{ self, nixpkgs, nixpkgs-old, flake-utils, ... }:
+  outputs = inputs@{ self, nixpkgs, flake-utils, ... }:
     flake-utils.lib.eachSystem [ flake-utils.lib.system.x86_64-linux ] (system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         lib = pkgs.lib;
 
-        nixpkgs-old-patched = pkgs.applyPatches {
-          name = "nixpkgs-old-patched";
-          src = nixpkgs-old;
-          patches = [
-            ./nix/fix-binutils-priority.patch
-            ./nix/use-binutilsCross-in-gcc.patch
-          ];
-        };
-
-        pkgs-old = (import nixpkgs-old-patched {
+        pkgs-i386 = (import nixpkgs {
           inherit system;
-        });
+          crossSystem = {
+            config = "i386-elf";
+          };
+        }).buildPackages;
 
-        cross = {
-          config = "i386-elf";
-          libc = "glibc";
-        };
+        dirs = lib.attrNames (lib.filterAttrs (file: type: type == "directory") (builtins.readDir ./kernel));
 
-        binutils = pkgs-old.binutils.override { inherit cross; };
-
-        gcc = pkgs-old.gcc5.cc.override {
-          inherit cross;
-          binutilsCross = binutils;
-          langCC = false;
-        };
-
-        gdb = pkgs-old.gdb.override { target = cross; };
-
-        dirs = lib.filterAttrs (file: type: type == "directory") (builtins.readDir ./kernel);
+        mapCallPackage = list: func: attrs:
+          lib.genAttrs list (name: pkgs.callPackage func (if builtins.typeOf attrs == "lambda" then attrs name else attrs));
       in
-      {
+      rec {
         devShells.default = pkgs.mkShell {
-          buildInputs = with pkgs; [
+          buildInputs = (with pkgs; [
+            nasm
+            qemu
+          ]) ++ (with pkgs-i386; [
             gcc
             binutils
             gdb
-            nasm
-            qemu
-          ];
+          ]);
         };
 
         packages =
           let
-            kernelPkgs = lib.mapAttrs'
-              (name: _: {
-                inherit name;
-                value = pkgs.callPackage ./nix/kernel.nix {
-                  inherit name gcc binutils;
-                  src = ./kernel + "/${name}";
-                };
-              })
-              dirs;
+            kernelPkgs = mapCallPackage dirs ./nix/kernel.nix (name: {
+              inherit name;
+              inherit (pkgs-i386) gcc binutils;
+              src = ./kernel + "/${name}";
+            });
           in
-          kernelPkgs // { inherit gcc binutils gdb; };
+          kernelPkgs // rec {
+            inherit (pkgs-i386) gcc binutils gdb;
+          };
 
         apps =
           let
-            kernelAppsPre = lib.mapAttrs'
-              (name: _: {
-                inherit name;
-                value = pkgs.callPackage ./nix/run.nix {
-                  drv = self.packages.${system}.${name};
-                  inherit gdb;
-                };
-              })
-              dirs;
+            kernelAppsPre = mapCallPackage dirs ./nix/run.nix (name: {
+              drv = self.packages.${system}.${name};
+              inherit (pkgs-i386) gdb;
+            });
 
-            kernelApps = lib.concatMapAttrs
+            kernelAppsFunction =
               (name: value: (lib.mapAttrs'
                 (iname: ivalue: {
                   name = "${name}-${iname}";
@@ -92,10 +65,13 @@
                   };
                 })
                 value) // { ${name} = self.apps.${system}."${name}-curses"; }
-              )
-              kernelAppsPre;
+              );
+
+            kernelApps = lib.concatMapAttrs kernelAppsFunction kernelAppsPre;
           in
           kernelApps;
+
+        checks = self.packages.${system};
       }
     );
 }
