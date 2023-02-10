@@ -46,6 +46,43 @@
           in
           kernelPkgs // rec {
             inherit (pkgs-i386) gcc binutils gdb;
+
+            docker-image = pkgs.dockerTools.buildLayeredImage {
+              name = "os-build-env";
+              tag = "latest";
+
+              contents = (with pkgs.dockerTools; [
+                usrBinEnv
+                binSh
+              ]) ++ [
+                gcc
+                binutils
+                gdb
+              ] ++ (with pkgs; [
+                bashInteractive
+                coreutils-full
+                diffutils
+                findutils
+                gawk
+                gnugrep
+                gnupatch
+                gnused
+                gnutar
+                gzip
+                xz
+                less
+                vim
+                ncurses
+                procps
+                su
+                time
+                utillinux
+                which
+                zstd
+              ]);
+
+              config.Cmd = [ "bash" ];
+            };
           };
 
         apps =
