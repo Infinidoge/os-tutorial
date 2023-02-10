@@ -79,9 +79,46 @@
                 utillinux
                 which
                 zstd
+                man
               ]);
 
-              config.Cmd = [ "bash" ];
+              enableFakechroot = true;
+              fakeRootCommands =
+                let
+                  starship-toml = pkgs.writeTextFile {
+                    name = "starship.toml";
+                    text = ''
+                      format = """$directory
+                      $character"""
+                    '';
+                  };
+
+                  profile = pkgs.writeTextFile {
+                    name = "bashrc";
+                    text = ''
+                      alias ls="ls --color=tty"
+                      alias l="ls -al"
+
+                      eval "$(${lib.getExe pkgs.starship} init bash)"
+
+                      export STARSHIP_CONFIG="${starship-toml}"
+                    '';
+                  };
+                in
+                ''
+                  #!${pkgs.runtimeShell}
+                  ${pkgs.dockerTools.shadowSetup}
+                  useradd --create-home user
+
+                  cat ${profile} > /etc/bashrc
+                '';
+
+
+              config = rec {
+                User = "user";
+                WorkingDir = "/home/${User}";
+                Cmd = [ "bash" ];
+              };
             };
           };
 
