@@ -52,13 +52,11 @@
               tag = "latest";
 
               contents = (with pkgs.dockerTools; [
+                # Docker stuff
                 usrBinEnv
                 binSh
-              ]) ++ [
-                gcc
-                binutils
-                gdb
-              ] ++ (with pkgs; [
+              ]) ++ (with pkgs; [
+                # Standard system tools
                 bashInteractive
                 coreutils-full
                 diffutils
@@ -67,20 +65,43 @@
                 gnugrep
                 gnupatch
                 gnused
+                less
+                procps
+                utillinux
+
+                # Other useful tools
+                fd
+                git
+                moreutils
+                ripgrep
+
+                # Compress/Decompression
                 gnutar
                 gzip
-                xz
-                less
-                vim
-                ncurses
-                procps
-                su
-                time
-                utillinux
-                which
+                unzip
+                zip
                 zstd
+
+                # File editing
+                helix
+                nano
+                vim
+
+                # Documentation
                 man
-              ]);
+                man-pages
+                man-pages-posix
+                tealdeer
+
+                # Build tools/OS env requirements
+                gnumake
+                ncurses
+              ]) ++ [
+                # i386 toolchain
+                gcc
+                binutils
+                gdb
+              ];
 
               enableFakechroot = true;
               fakeRootCommands =
