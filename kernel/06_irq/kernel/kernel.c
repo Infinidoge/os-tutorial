@@ -6,6 +6,11 @@
 void _start() {
     isr_install();
     /* Test the interrupts */
-    __asm__ __volatile__("int $2");
-    __asm__ __volatile__("int $3");
+
+    void irq_demonstration(registers_t r) {
+        kprint("Called from an IRQ demonstration function!");
+    }
+    register_interrupt_handler(IRQ0, irq_demonstration);
+
+    __asm__ __volatile__("int $32");
 }
