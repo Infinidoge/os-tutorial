@@ -1,7 +1,8 @@
 { stdenvNoCC
-, gcc
-, binutils
+, pkgs-i386
 , nasm
+
+  # Meta Attributes
 , name
 , src
 }:
@@ -10,7 +11,7 @@ stdenvNoCC.mkDerivation {
 
   preferLocalBuild = true;
 
-  nativeBuildInputs = [ gcc binutils nasm ];
+  nativeBuildInputs = [ pkgs-i386.gcc pkgs-i386.binutils nasm ];
 
   postPatch = ''
     cp ${./Makefile} Makefile
