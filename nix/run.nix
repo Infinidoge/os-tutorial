@@ -1,4 +1,9 @@
-{ lib, writeScriptBin, qemu, gdb, drv }:
+{ lib
+, writeScriptBin
+, qemu
+, pkgs-i386
+, drv
+}:
 let
   tmp = "tmp=$(mktemp -d --tmpdir cs3502-kernel.XXXX); cd $tmp";
   i386 = "${qemu}/bin/qemu-system-i386";
@@ -30,6 +35,6 @@ in
     ${tmp}
     cp ${drv}/kernel.elf .
     cp -r ${drv.src}/* .
-    ${gdb}/bin/i386-elf-gdb -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
+    ${pkgs-i386.gdb}/bin/i386-elf-gdb -ex "target remote localhost:1234" -ex "symbol-file kernel.elf"
   '';
 }
