@@ -4,6 +4,8 @@
 #include "../libc/string.h"
 
 void _start() {
+    clear_screen();
+
     isr_install();
     irq_install();
 
