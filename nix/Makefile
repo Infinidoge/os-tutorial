@@ -10,7 +10,7 @@ LD = i386-elf-ld
 
 # -g: Use debugging symbols in gcc
 CFLAGS = -g -ffreestanding
-LDFLAGS = -nostdlib
+LDFLAGS = -Ttext 0x1000
 
 # First rule is run by default
 os-image.bin: boot/bootsect.bin kernel.bin
@@ -19,11 +19,11 @@ os-image.bin: boot/bootsect.bin kernel.bin
 # '--oformat binary' deletes all symbols as a collateral, so we don't need
 # to 'strip' them manually on this case
 kernel.bin: boot/kernel_entry.o ${OBJ}
-	${LD} ${LDFLAGS} -o $@ -Ttext 0x1000 $^ --oformat binary
+	${LD} ${LDFLAGS} -o $@ $^ --oformat binary
 
 # Used for debugging purposes
 kernel.elf: boot/kernel_entry.o ${OBJ}
-	${LD} ${LDFLAGS} -o $@ -Ttext 0x1000 $^
+	${LD} ${LDFLAGS} -o $@ $^
 
 # Generic rules for wildcards
 # To make an object, always compile from its .c
