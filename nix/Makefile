@@ -10,7 +10,8 @@ LD = i386-elf-ld
 
 # -g: Use debugging symbols in gcc
 CFLAGS = -g -ffreestanding
-LDFLAGS = -Ttext 0x1000
+LIBGCC = -L $(shell ${CC} ${CFLAGS} -print-libgcc-file-name | dirname) -lgcc
+LDFLAGS = -nostdlib ${LIBGCC} -Ttext 0x1000
 
 # First rule is run by default
 os-image.bin: boot/bootsect.bin kernel.bin
