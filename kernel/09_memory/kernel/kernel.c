@@ -1,9 +1,8 @@
 #include "kernel.h"
 #include "../cpu/isr.h"
 #include "../drivers/screen.h"
+#include "../libc/meta.h"
 #include "../libc/string.h"
-
-extern size_t _end;
 
 void _start() {
     clear_screen();
@@ -11,11 +10,25 @@ void _start() {
     isr_install();
     irq_install();
 
-    char str[10];
-    hex_to_ascii(&_end, str);
+    char etext[10];
+    hex_to_ascii(ETEXT, etext);
 
-    kprint("Address: ");
-    kprint(str);
+    char edata[10];
+    hex_to_ascii(EDATA, edata);
+
+    char end[10];
+    hex_to_ascii(END, end);
+
+    kprint("etext: ");
+    kprint(etext);
+    kprint("\n");
+
+    kprint("edata: ");
+    kprint(edata);
+    kprint("\n");
+
+    kprint("end: ");
+    kprint(end);
     kprint("\n");
 
     kprint("Type something, it will go through the kernel\n"
