@@ -1,6 +1,7 @@
 #include "screen.h"
 #include "../cpu/ports.h"
 #include "../libc/mem.h"
+#include <stdarg.h>
 
 /* Declaration of private functions */
 int get_cursor_offset();
@@ -17,8 +18,9 @@ int get_offset_col(int offset);
 /**
  * Print a message on the specified location
  * If col, row, are negative, we will use the current offset
+ * Print until the given sentinel value.
  */
-void kprint_at(char *message, int col, int row) {
+void kprint_at_until(const char *message, char sentinel, int col, int row) {
     /* Set cursor if col/row are negative */
     int offset;
     if (col >= 0 && row >= 0)
@@ -31,7 +33,7 @@ void kprint_at(char *message, int col, int row) {
 
     /* Loop through message and print it */
     int i = 0;
-    while (message[i] != 0) {
+    while (message[i] != sentinel) {
         offset = print_char(message[i++], col, row, WHITE_ON_BLACK);
         /* Compute row/col for next iteration */
         row = get_offset_row(offset);
@@ -39,8 +41,37 @@ void kprint_at(char *message, int col, int row) {
     }
 }
 
-void kprint(char *message) {
+void kprint_at(const char *message, int col, int row) {
+    kprint_at_until(message, 0, col, row);
+}
+
+void kprint(const char *message) {
     kprint_at(message, -1, -1);
+}
+
+void kprint_until(const char *message, char sentinel) {
+    kprint_at_until(message, sentinel, -1, -1);
+}
+
+void kprintf(const char *format, ...) {
+    va_list ptr;
+    va_start(ptr, format);
+
+    int last = 0;
+
+    for (int i = 0; format[i] != 0; i++) {
+        if (i == 0)
+            continue;
+
+        if (format[i - 1] == '{' && format[i] == '}') {
+            kprint_until(&format[last], '{');
+            kprint(va_arg(ptr, char *));
+            last = i + 1;
+        }
+    }
+    kprint(&format[last]);
+
+    va_end(ptr);
 }
 
 void kprint_backspace() {
@@ -97,12 +128,10 @@ int print_char(char c, int col, int row, char attr) {
         int i;
         for (i = 1; i < MAX_ROWS; i++)
             memory_copy((uint8_t *)(get_offset(0, i) + VIDEO_ADDRESS),
-                (uint8_t *)(get_offset(0, i - 1) + VIDEO_ADDRESS),
-                MAX_COLS * 2);
+                (uint8_t *)(get_offset(0, i - 1) + VIDEO_ADDRESS), MAX_COLS * 2);
 
         /* Blank last line */
-        char *last_line =
-            (char *)(get_offset(0, MAX_ROWS - 1) + (uint8_t *)VIDEO_ADDRESS);
+        char *last_line = (char *)(get_offset(0, MAX_ROWS - 1) + (uint8_t *)VIDEO_ADDRESS);
         for (i = 0; i < MAX_COLS * 2; i++)
             last_line[i] = 0;
 
