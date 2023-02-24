@@ -22,4 +22,29 @@ void kprint_until(const char *message, char sentinel);
 void kprintf(const char *format, ...);
 void kprint_backspace();
 
+#define __DEBUG(name, variable) kprintf(#name ": {}\n", variable)
+#define DEBUG(variable) __DEBUG(variable, variable)
+
+#define DEBUG_INT_P(variable, length)  \
+    {                                  \
+        char __tmp[length];            \
+        int_to_ascii(variable, __tmp); \
+        __DEBUG(variable, __tmp);      \
+    }
+#define DEBUG_INT(variable) DEBUG_INT_P(variable, 16)
+
+#define DEBUG_HEX_P(variable, length)  \
+    {                                  \
+        char __tmp[length];            \
+        hex_to_ascii(variable, __tmp); \
+        __DEBUG(variable, __tmp);      \
+    }
+#define DEBUG_HEX(variable) DEBUG_HEX_P(variable, 16)
+
+#define DEBUG_CHAR(variable)                       \
+    {                                              \
+        char __tmp[] = {'`', variable, '`', '\0'}; \
+        __DEBUG(variable, __tmp);                  \
+    }
+
 #endif
