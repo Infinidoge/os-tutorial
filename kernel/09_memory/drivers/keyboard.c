@@ -201,8 +201,8 @@ bool next_upper = false;
 
 static char get_letter(int scancode) {
     if (next_upper) {
-        return sc_upper[scancode];
         next_upper = false;
+        return sc_upper[scancode];
     } else {
         return sc_lower[scancode];
     }
