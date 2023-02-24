@@ -1,4 +1,7 @@
 IndentWidth: 4
 AlignAfterOpenBracket: false
+AlignEscapedNewlines: Left
 AllowShortFunctionsOnASingleLine: Empty
+AlignOperands: Align
+BreakBeforeBinaryOperators: NonAssignment
 ColumnLimit: 120
