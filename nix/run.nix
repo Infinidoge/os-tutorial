@@ -1,7 +1,7 @@
 { lib, writeScriptBin, qemu, gdb, drv }:
 let
   tmp = "tmp=$(mktemp -d --tmpdir cs3502-kernel.XXXX); cd $tmp";
-  i386 = "${qemu}/bin//qemu-system-i386";
+  i386 = "${qemu}/bin/qemu-system-i386";
   qemuArgs = "-boot order=a -drive file=os-image.bin,index=0,if=floppy,format=raw";
 in
 {
