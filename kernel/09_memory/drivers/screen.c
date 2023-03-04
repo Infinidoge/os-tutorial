@@ -6,6 +6,7 @@
 /* Declaration of private functions */
 int get_cursor_offset();
 void set_cursor_offset(int offset);
+void vkprintf(const char *format, va_list ptr);
 int print_char(char c, int col, int row, char attr);
 int get_offset(int col, int row);
 int get_offset_row(int offset);
@@ -49,14 +50,57 @@ void kprint(const char *message) {
     kprint_at(message, -1, -1);
 }
 
+void kprintln(const char *message) {
+    kprint(message);
+    kprint("\n");
+}
+
 void kprint_until(const char *message, char sentinel) {
     kprint_at_until(message, sentinel, -1, -1);
+}
+
+void kprintln_until(const char *message, char sentinel) {
+    kprint_until(message, sentinel);
+    kprint("\n");
 }
 
 void kprintf(const char *format, ...) {
     va_list ptr;
     va_start(ptr, format);
+    vkprintf(format, ptr);
+    va_end(ptr);
+}
 
+void kprintlnf(const char *format, ...) {
+    va_list ptr;
+    va_start(ptr, format);
+    vkprintf(format, ptr);
+    va_end(ptr);
+    kprint("\n");
+}
+
+void kprint_backspace() {
+    int offset = get_cursor_offset() - 2;
+    int row = get_offset_row(offset);
+    int col = get_offset_col(offset);
+    print_char(0x08, col, row, WHITE_ON_BLACK);
+}
+
+void print_prompt() {
+    int offset = get_cursor_offset();
+    if (get_offset_col(offset) != 0) {
+        print_char('%', get_offset_col(offset), get_offset_row(offset), BLACK_ON_WHITE);
+        kprint("\n");
+    }
+
+    kprint(PROMPT);
+}
+
+/**********************************************************
+ * Private kernel functions                               *
+ **********************************************************/
+
+void vkprintf(const char *format, va_list ptr) {
     int last = 0;
 
     for (int i = 0; format[i] != 0; i++) {
@@ -70,20 +114,7 @@ void kprintf(const char *format, ...) {
         }
     }
     kprint(&format[last]);
-
-    va_end(ptr);
 }
-
-void kprint_backspace() {
-    int offset = get_cursor_offset() - 2;
-    int row = get_offset_row(offset);
-    int col = get_offset_col(offset);
-    print_char(0x08, col, row, WHITE_ON_BLACK);
-}
-
-/**********************************************************
- * Private kernel functions                               *
- **********************************************************/
 
 /**
  * Innermost print function for our kernel, directly accesses the video memory

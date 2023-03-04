@@ -7,6 +7,7 @@
 #define MAX_ROWS 25
 #define MAX_COLS 80
 #define WHITE_ON_BLACK 0x0f
+#define BLACK_ON_WHITE 0xf0
 #define RED_ON_WHITE 0xf4
 
 /* Screen i/o ports */
@@ -18,9 +19,18 @@ void clear_screen();
 void kprint_at_until(const char *message, char sentinel, int col, int row);
 void kprint_at(const char *message, int col, int row);
 void kprint(const char *message);
+void kprintln(const char *message);
 void kprint_until(const char *message, char sentinel);
+void kprintln_until(const char *message, char sentinel);
 void kprintf(const char *format, ...);
+void kprintlnf(const char *format, ...);
 void kprint_backspace();
+
+/* Utilities for the shell */
+#define PROMPT "> "
+void print_prompt();
+
+/* Debug Macros */
 
 #define __DEBUG(name, variable) kprintf(#name ": {}\n", variable)
 #define DEBUG(variable) __DEBUG(variable, variable)
