@@ -208,7 +208,7 @@ static char get_letter(int scancode) {
     }
 }
 
-#define KEY_BUFFER_EMPTY key_buffer[0] != '\0'
+#define KEY_BUFFER_EMPTY (key_buffer[0] == '\0')
 
 static void keyboard_callback(registers_t regs) {
     /* The PIC leaves us the scancode in port 0x60 */
@@ -216,9 +216,11 @@ static void keyboard_callback(registers_t regs) {
 
     if (scancode > SC_MAX)
         return;
-    if (scancode == BACKSPACE && KEY_BUFFER_EMPTY) {
-        backspace(key_buffer);
-        kprint_backspace();
+    if (scancode == BACKSPACE) {
+        if (!KEY_BUFFER_EMPTY) {
+            backspace(key_buffer);
+            kprint_backspace();
+        }
     } else if (scancode == ENTER) {
         kprint("\n");
         user_input(key_buffer); /* kernel-controlled function */
