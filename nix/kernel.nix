@@ -10,6 +10,7 @@ stdenvNoCC.mkDerivation {
   inherit name src;
 
   preferLocalBuild = true;
+  allowSubstitutes = false;
 
   nativeBuildInputs = [ pkgs-i386.gcc pkgs-i386.binutils nasm ];
 
