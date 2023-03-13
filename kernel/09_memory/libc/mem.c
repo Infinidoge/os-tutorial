@@ -1,7 +1,7 @@
 #include "mem.h"
 #include "meta.h"
 
-void memory_copy(uint8_t *source, uint8_t *dest, int nbytes) {
+void memory_copy(uint8_t *source, uint8_t *dest, size_t nbytes) {
     int i;
     for (i = 0; i < nbytes; i++) {
         *(dest + i) = *(source + i);
