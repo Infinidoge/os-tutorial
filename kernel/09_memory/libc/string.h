@@ -5,6 +5,8 @@
 
 void int_to_ascii(int n, char str[]);
 void hex_to_ascii(int n, char str[]);
+void uint_to_ascii(unsigned int n, char str[]);
+void uhex_to_ascii(unsigned int n, char str[]);
 void reverse(char s[]);
 int strlen(const char s[]);
 void backspace(char s[]);

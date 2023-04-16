@@ -44,6 +44,32 @@ void hex_to_ascii(int n, char str[]) {
     reverse(str);
 }
 
+void uint_to_ascii(unsigned int n, char str[]) {
+    int i = 0;
+    do {
+        str[i++] = n % 10 + '0';
+    } while ((n /= 10) > 0);
+
+    str[i] = '\0';
+
+    reverse(str);
+}
+
+void uhex_to_ascii(unsigned int n, char str[]) {
+    int i = 0;
+
+    do {
+        str[i++] = hex[n % 16];
+    } while ((n >>= 4) > 0);
+
+    str[i++] = 'x';
+    str[i++] = '0';
+
+    str[i] = '\0';
+
+    reverse(str);
+}
+
 /* K&R */
 void reverse(char s[]) {
     int c, i, j;
