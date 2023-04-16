@@ -57,4 +57,19 @@ void print_prompt();
         __DEBUG(variable, __tmp);                  \
     }
 
+#define DEBUG_UINT_P(variable, length)  \
+    {                                   \
+        char __tmp[length];             \
+        uint_to_ascii(variable, __tmp); \
+        __DEBUG(variable, __tmp);       \
+    }
+#define DEBUG_UINT(variable) DEBUG_UINT_P(variable, 16)
+
+#define DEBUG_UHEX_P(variable, length)  \
+    {                                   \
+        char __tmp[length];             \
+        uhex_to_ascii(variable, __tmp); \
+        __DEBUG(variable, __tmp);       \
+    }
+#define DEBUG_UHEX(variable) DEBUG_UHEX_P(variable, 16)
 #endif
