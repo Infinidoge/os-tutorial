@@ -2,6 +2,7 @@
 #define SCREEN_H
 
 #include "../cpu/types.h"
+#include "../libc/string.h"
 
 #define VIDEO_ADDRESS 0xb8000
 #define MAX_ROWS 25
