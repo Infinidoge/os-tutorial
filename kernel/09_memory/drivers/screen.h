@@ -72,4 +72,7 @@ void print_prompt();
         __DEBUG(variable, __tmp);       \
     }
 #define DEBUG_UHEX(variable) DEBUG_UHEX_P(variable, 16)
+
+#define DEBUG_POINTER(variable) DEBUG_UHEX((size_t)variable)
+
 #endif
