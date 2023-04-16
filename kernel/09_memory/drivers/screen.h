@@ -26,6 +26,8 @@ void kprintln_until(const char *message, char sentinel);
 void kprintf(const char *format, ...);
 void kprintlnf(const char *format, ...);
 void kprint_backspace();
+void paint(char c, char attr, int col, int row);
+void paint_rect(char c, char attr, int origin_col, int origin_row, int width, int height, bool fill);
 
 /* Utilities for the shell */
 #define PROMPT "> "

@@ -96,6 +96,48 @@ void print_prompt() {
     kprint(PROMPT);
 }
 
+#define __OFF_SCREEN(var) var >= MAX_COLS || var < 0
+#define OFF_SCREEN(var1, var2) __OFF_SCREEN(var1) || __OFF_SCREEN(var2)
+
+/**
+ * Raw screen painting function
+ */
+void paint(char c, char attr, int col, int row) {
+    uint8_t *vidmem = (uint8_t *)VIDEO_ADDRESS;
+
+    if (OFF_SCREEN(col, row)) {
+        vidmem[2 * (MAX_COLS) * (MAX_ROWS)-2] = 'E';
+        vidmem[2 * (MAX_COLS) * (MAX_ROWS)-1] = RED_ON_WHITE;
+        return;
+    }
+
+    int offset = get_offset(col, row);
+
+    vidmem[offset] = c;
+    vidmem[offset + 1] = attr;
+}
+
+#define ON_RECT_EDGE col == 0 || col == (width - 1) || row == 0 || row == (height - 1)
+
+void paint_rect(char c, char attr, int origin_col, int origin_row, int width, int height, bool fill) {
+    if (OFF_SCREEN(origin_col, origin_row) || OFF_SCREEN(origin_col + width, origin_row + height)) {
+        paint('E', RED_ON_WHITE, MAX_COLS - 1, MAX_ROWS - 1);
+        return;
+    }
+
+    for (int col = 0; col < width; col++) {
+        for (int row = 0; row < height; row++) {
+            if (fill || ON_RECT_EDGE) {
+                paint(c, attr, col + origin_col, row + origin_row);
+            }
+        }
+    }
+}
+
+#undef ON_RECT_EDGE
+#undef __OFF_SCREEN
+#undef OFF_SCREEN
+
 /**********************************************************
  * Private kernel functions                               *
  **********************************************************/
