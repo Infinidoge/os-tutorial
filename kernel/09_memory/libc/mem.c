@@ -14,9 +14,8 @@ void memory_set(uint8_t *dest, uint8_t val, uint32_t len) {
         *temp++ = val;
 }
 
-size_t free_mem_addr = END;
-
 size_t kmalloc_naive(size_t size, bool align, size_t *phys_addr) {
+    static size_t free_mem_addr = END;
     if (align && (free_mem_addr & 0xFFFFF000)) {
         free_mem_addr &= 0xFFFFF000;
         free_mem_addr += 0x1000;
