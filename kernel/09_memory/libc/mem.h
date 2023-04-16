@@ -15,5 +15,5 @@ void memory_set(uint8_t *dest, uint8_t val, uint32_t len);
 #define SIZE_T_SIZE (ALIGN(sizeof(size_t)))
 
 /* At this stage there is no 'free' implemented. */
-size_t kmalloc(size_t size, bool align, size_t *phys_addr);
+size_t kmalloc_naive(size_t size, bool align, size_t *phys_addr);
 #endif

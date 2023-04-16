@@ -37,7 +37,7 @@ CMD(end) {
 CMD(page) {
     UNUSED(input);
     size_t phys_addr;
-    size_t page = kmalloc(1000, true, &phys_addr);
+    size_t page = kmalloc_naive(1000, true, &phys_addr);
 
     char page_str[16];
     hex_to_ascii(page, page_str);
