@@ -32,7 +32,7 @@ void print_prompt();
 
 /* Debug Macros */
 
-#define __DEBUG(name, variable) kprintf(#name ": {}\n", variable)
+#define __DEBUG(name, variable) kprintlnf(#name ": {}", variable)
 #define DEBUG(variable) __DEBUG(variable, variable)
 
 #define DEBUG_INT_P(variable, length)  \
