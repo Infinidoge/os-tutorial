@@ -42,28 +42,55 @@ void kprint_at_until(const char *message, char sentinel, int col, int row) {
     }
 }
 
+/**
+ * Print a message at the specified location
+ * If col, row, are negative, will use the current offset
+ * Prints until a null byte
+ */
 void kprint_at(const char *message, int col, int row) {
     kprint_at_until(message, 0, col, row);
 }
 
+/**
+ * Prints a message at the current offset
+ * Prints until a null byte
+ */
 void kprint(const char *message) {
     kprint_at(message, -1, -1);
 }
 
+/**
+ * Prints a message at the current offset, appending a newline at the end
+ * Prints until a null byte
+ */
 void kprintln(const char *message) {
     kprint(message);
     kprint("\n");
 }
 
+/**
+ * Prints a message at the current offset
+ * Prints until the given sentinel value
+ */
 void kprint_until(const char *message, char sentinel) {
     kprint_at_until(message, sentinel, -1, -1);
 }
 
+/**
+ * Prints a message at the current offset
+ * Prints until the given sentinel value
+ * Once the sentinel is reached, prints a newline
+ */
 void kprintln_until(const char *message, char sentinel) {
     kprint_until(message, sentinel);
     kprint("\n");
 }
 
+/**
+ * Prints a message, formatting in variable values based on the given format string
+ * Variable values must be character arrays/strings
+ * Prints until a null byte in the format string
+ */
 void kprintf(const char *format, ...) {
     va_list ptr;
     va_start(ptr, format);
@@ -71,6 +98,12 @@ void kprintf(const char *format, ...) {
     va_end(ptr);
 }
 
+/**
+ * Prints a message, formatting in variable values based on the given format string
+ * Variable values must be character arrays/strings
+ * Prints until a null byte in the format string
+ * Prints a final newline at the end
+ */
 void kprintlnf(const char *format, ...) {
     va_list ptr;
     va_start(ptr, format);
@@ -79,6 +112,9 @@ void kprintlnf(const char *format, ...) {
     kprint("\n");
 }
 
+/**
+ * Prints a backspace, erasing the previous character and changing the offset
+ */
 void kprint_backspace() {
     int offset = get_cursor_offset() - 2;
     int row = get_offset_row(offset);
@@ -86,6 +122,10 @@ void kprint_backspace() {
     print_char(0x08, col, row, WHITE_ON_BLACK);
 }
 
+/**
+ * Prints a terminal prompt on a newline
+ * If the previous output did not end on a newline, prints a Black-on-White percent sign (%) to indicate this
+ */
 void print_prompt() {
     int offset = get_cursor_offset();
     if (get_offset_col(offset) != 0) {
