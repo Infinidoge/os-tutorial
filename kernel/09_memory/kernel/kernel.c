@@ -10,6 +10,7 @@ void _start() {
 
     isr_install();
     irq_install();
+    init_memory();
 
     kprint("Type something, it will go through the kernel\n"
            "Type help for a list of commands\n"
