@@ -37,6 +37,9 @@ size_t kmalloc_naive(size_t size, bool align, size_t *phys_addr) {
 
 ///////// Linked List Implementation //////////
 
+#define NEXT(node) node = node->next
+#define PREV(node) node = node->prev
+
 node *create_node(size_t address, size_t size) {
     node *new_node = (node *)kmalloc_naive(sizeof(node), false, NULL);
     new_node->address = address;
@@ -76,6 +79,28 @@ node *find(node *list, size_t address) {
     while (current != NULL && current->address != address) {
         current = current->next;
     }
+
+    return current;
+}
+
+node *head(node *list) {
+    if (list == NULL)
+        return NULL;
+
+    node *current = list;
+    while (current->prev != NULL)
+        current = current->prev;
+
+    return current;
+}
+
+node *tail(node *list) {
+    if (list == NULL)
+        return NULL;
+
+    node *current = list;
+    while (current->next != NULL)
+        current = current->next;
 
     return current;
 }
@@ -195,6 +220,18 @@ size_t length(node *list) {
     return length;
 }
 
+node *clone_list(node *list) {
+    node *new_list;
+
+    node *current = list;
+    while (current != NULL) {
+        new_list = add_new(new_list, current->address, current->size);
+        current = current->next;
+    }
+
+    return new_list;
+}
+
 ///////// alloc implementation //////////
 
 static node *allocated = NULL;
@@ -265,6 +302,8 @@ size_t kcalloc(size_t n, size_t size);
 
 size_t krealloc(size_t address, size_t size, bool align, size_t align_size);
 
+void merge_free() {}
+
 void kfree(size_t address) {
     node *target = find(allocated, address);
     if (target == NULL)
@@ -293,12 +332,7 @@ void kfree(size_t address) {
 }
 
 void print_memory() {
-    int total = (FREE_MEM_END - FREE_MEM_START) / 1024;
-
-    char __tmp_total[16];
-    int_to_ascii(total, __tmp_total);
-
-    kprintlnf("Total Physical Memory: {}kb", __tmp_total);
+    kprintlnf("Total Physical Memory: {i}kb", (FREE_MEM_END - FREE_MEM_START) / 1024);
 
     int free_total = 0;
     node *current = free;
@@ -306,11 +340,7 @@ void print_memory() {
         free_total += current->size;
         current = current->next;
     }
-
-    char __tmp_free[16];
-    int_to_ascii(free_total / 1024, __tmp_free);
-
-    kprintlnf("Total Free: {}kb", __tmp_free);
+    kprintlnf("Total Free: {i}kb", free_total / 1024);
 
     int allocated_total = 0;
     current = allocated;
@@ -318,23 +348,30 @@ void print_memory() {
         allocated_total += current->size;
         current = current->next;
     }
-    char __tmp_allocated[16];
-    int_to_ascii(allocated_total / 1024, __tmp_allocated);
-    kprintlnf("Total Allocated: {}kb", __tmp_allocated);
+    kprintlnf("Total Allocated: {i}kb", allocated_total / 1024);
 
-    char __tmp_length_allocated[16];
-    int_to_ascii(length(allocated), __tmp_length_allocated);
-    char __tmp_length_free[16];
-    int_to_ascii(length(free), __tmp_length_free);
+    kprintlnf("Number of allocations: {i}", length(allocated));
+    kprintlnf("Number of free gaps: {i}", length(free));
+    kprintlnf("Start of Memory: {i}", FREE_MEM_START);
+    kprintlnf("End of Memory: {i}", FREE_MEM_END - 1);
+}
 
-    kprintlnf("Number of allocations: {}", __tmp_length_allocated);
-    kprintlnf("Number of free gaps: {}", __tmp_length_free);
+void memory_map() {
+    kprintln("Memory Map:");
 
-    char __tmp_start[16];
-    uhex_to_ascii(FREE_MEM_START, __tmp_start);
-    kprintlnf("Start of Memory: {}", __tmp_start);
+    node *current_allocated = allocated;
+    node *current_free = free;
 
-    char __tmp_end[16];
-    uhex_to_ascii(FREE_MEM_END - 1, __tmp_end);
-    kprintlnf("End of Memory: {}", __tmp_end);
+    while (current_allocated != NULL || current_free != NULL) {
+        if (current_free == NULL || current_allocated->address < current_free->address) {
+            kprintlnf("{x} - {x} Allocated region of {i}kb", current_allocated->address,
+                current_allocated->address + current_allocated->size - 1, current_allocated->size / 1024);
+            NEXT(current_allocated);
+        } else if (current_allocated == NULL || current_free->address < current_allocated->address) {
+
+            kprintlnf("{x} - {x} Free region of {i}kb", current_free->address,
+                current_free->address + current_free->size - 1, current_free->size / 1024);
+            NEXT(current_free);
+        }
+    }
 }

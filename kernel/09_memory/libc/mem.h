@@ -46,5 +46,6 @@ node *delete_by_address(node *list, size_t address);
 node *find(node *list, size_t address);
 
 void print_memory();
+void memory_map();
 
 #endif

@@ -124,6 +124,7 @@ CMD(memory) {
     UNUSED(input);
 
     print_memory();
+    memory_map();
 }
 
 CMD(help) {
