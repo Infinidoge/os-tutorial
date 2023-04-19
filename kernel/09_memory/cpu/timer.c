@@ -2,12 +2,24 @@
 #include "../libc/function.h"
 #include "isr.h"
 #include "ports.h"
+#include "types.h"
 
-uint32_t tick = 0;
+volatile uint32_t tick = 0;
+
+volatile uint32_t get_tick() {
+    return tick;
+}
+
+void wait(uint32_t ticks) {
+    uint32_t current = tick;
+    while (tick <= current + ticks) {
+        asm volatile("nop");
+    }
+}
 
 static void timer_callback(registers_t regs) {
-    tick++;
     UNUSED(regs);
+    tick++;
 }
 
 void init_timer(uint32_t freq) {
