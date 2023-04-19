@@ -21,6 +21,7 @@ CMD(end);
 CMD(test);
 /* CMD(program); */
 CMD(memory);
+CMD(colors);
 CMD(help);
 CMD(echo);
 CMD(clear);
@@ -30,6 +31,7 @@ const command commands[] = {
     CMDREF(test, "Runs whatever test code is currently in place"),
     /* CMDREF(program, "Runs the program"), */
     CMDREF(memory, "Prints out the current status of main memory"),
+    CMDREF(colors, "Prints out all of the colors, with color codes"),
     CMDREF(help, "Prints a list of commands with help text"),
     CMDREF(echo, "Echos the input back to you"),
     CMDREF(clear, "Clears the screen"),
@@ -55,6 +57,12 @@ CMD(memory) {
 
     print_memory();
     memory_map();
+}
+
+CMD(colors) {
+    for (int i = 0; i < 16; i++) {
+        paint((char)i + 48, i, i, 0);
+    }
 }
 
 CMD(help) {
