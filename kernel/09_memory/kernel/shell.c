@@ -6,6 +6,7 @@
 #include "../libc/string.h"
 /* #include "program.h" */
 #include "scheduler.h"
+#include "visualise.h"
 
 typedef struct Command {
     const char *key;
@@ -20,6 +21,7 @@ typedef struct Command {
 CMD(end);
 CMD(test);
 /* CMD(program); */
+CMD(visualise);
 CMD(memory);
 CMD(colors);
 CMD(help);
@@ -30,6 +32,7 @@ const command commands[] = {
     CMDREF(end, "Halts the CPU"),
     CMDREF(test, "Runs whatever test code is currently in place"),
     /* CMDREF(program, "Runs the program"), */
+    CMDREF(visualise, "Runs the visualiser"),
     CMDREF(memory, "Prints out the current status of main memory"),
     CMDREF(colors, "Prints out all of the colors, with color codes"),
     CMDREF(help, "Prints a list of commands with help text"),
@@ -51,6 +54,21 @@ CMD(test) {
 /*     UNUSED(input); */
 /*     schedule(&program); */
 /* } */
+
+CMD(visualise) {
+    if (strcmp(input, "bubble") == 0)
+        algorithm = BUBBLE;
+    else if (strcmp(input, "insertion") == 0)
+        algorithm = INSERTION;
+    else if (strcmp(input, "quick") == 0)
+        algorithm = QUICK;
+    else if (strcmp(input, "merge") == 0)
+        algorithm = MERGE;
+    else
+        algorithm = BUBBLE;
+
+    schedule(&visualiser);
+}
 
 CMD(memory) {
     UNUSED(input);
