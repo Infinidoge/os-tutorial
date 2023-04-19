@@ -140,7 +140,7 @@ static void shell_key_handler(uint8_t scancode) {
         kprint("\n");
         schedule(&user_input);
     } else if (scancode == LSHIFT || scancode == RSHIFT) {
-        static bool next_upper = true;
+        next_upper = true;
     } else {
         char letter = get_letter(scancode, next_upper);
         if (next_upper)
