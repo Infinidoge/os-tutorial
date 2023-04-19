@@ -170,6 +170,14 @@ void visualise_insertion(int *array) {
     kprintf_at(0, LINE1)("Done!");
 }
 
+#define RETURN_IF(variable) \
+    if (variable)           \
+    return
+
+#define RETURN_VALUE_IF(variable, value) \
+    if (variable)                        \
+    return value
+
 int partition(int *array, int low, int high, enum Colors *status) {
     int pivot = array[high];
     kprintf_at(0, LINE2)("Pivot is {i}", pivot);
@@ -185,17 +193,14 @@ int partition(int *array, int low, int high, enum Colors *status) {
     }
 
     for (int j = low; j < high; j++) {
-        if (!running)
-            return 0;
+        RETURN_VALUE_IF(!running, 0);
         kprintf_at(0, LINE2)("Comparing {i} with pivot", j);
         status[j] = SELECTED;
         wait(5 * SPEED_FACTOR);
-        if (!running)
-            return 0;
+        RETURN_VALUE_IF(!running, 0);
         render_status(status);
         if (array[j] <= pivot) {
-            if (!running)
-                return 0;
+            RETURN_VALUE_IF(!running, 0);
             if (status[i] == INDEX)
                 status[i] = NONE;
             i++;
@@ -204,8 +209,7 @@ int partition(int *array, int low, int high, enum Colors *status) {
             render_status(status);
             kprintf_at(0, LINE3)("Swapping");
             wait(5 * SPEED_FACTOR);
-            if (!running)
-                return 0;
+            RETURN_VALUE_IF(!running, 0);
             swap(array, i, j);
             render_array(array, ARRAY_STARTING_ROW);
         }
@@ -218,11 +222,9 @@ int partition(int *array, int low, int high, enum Colors *status) {
         status[i] = NONE;
     i++;
     kprintf_at(0, LINE2)("Moving pivot element into correct position ({i})", i);
-    if (!running)
-        return 0;
+    RETURN_VALUE_IF(!running, 0);
     wait(5 * SPEED_FACTOR);
-    if (!running)
-        return 0;
+    RETURN_VALUE_IF(!running, 0);
     swap(array, i, high);
     status[high] = NONE;
     status[i] = SPECIAL;
@@ -240,8 +242,7 @@ void quicksort(int *array, int low, int high, enum Colors *status) {
     kprintf_at(0, LINE1)("Partitioning array from {i} to {i}", low, high);
 
     int p = partition(array, low, high, status);
-    if (!running)
-        return;
+    RETURN_IF(!running);
     status[p] = DONE;
     render_status(status);
     render_array(array, ARRAY_STARTING_ROW);
@@ -249,21 +250,17 @@ void quicksort(int *array, int low, int high, enum Colors *status) {
     clear_info();
     kprintf_at(0, LINE1)("Running quicksort from {i} to {i}", low, p - 1);
     wait(5 * SPEED_FACTOR);
-    if (!running)
-        return;
+    RETURN_IF(!running);
     quicksort(array, low, p - 1, status);
-    if (!running)
-        return;
+    RETURN_IF(!running);
     render_array(array, ARRAY_STARTING_ROW);
 
     clear_info();
     kprintf_at(0, LINE1)("Running quicksort from {i} to {i}", p + 1, high);
     wait(5 * SPEED_FACTOR);
-    if (!running)
-        return;
+    RETURN_IF(!running);
     quicksort(array, p + 1, high, status);
-    if (!running)
-        return;
+    RETURN_IF(!running);
     render_array(array, ARRAY_STARTING_ROW);
 }
 
@@ -272,11 +269,9 @@ void visualise_quick(int *array) {
     mark_many(status, 0, ARRAY_SIZE, NONE);
     render_status(status);
 
-    if (!running)
-        return;
+    RETURN_IF(!running);
     quicksort(array, 0, ARRAY_SIZE - 1, status);
-    if (!running)
-        return;
+    RETURN_IF(!running);
 
     mark_many(status, 0, ARRAY_SIZE, DONE);
     clear_info();
@@ -291,6 +286,7 @@ void merge(int *array, int low, int middle, int high) {
         return;
 
     while (low <= middle && low2 <= high) {
+        RETURN_IF(!running);
         if (array[low] <= array[low2]) {
             low++;
         } else {
@@ -316,22 +312,27 @@ void mergesort(enum Colors *status, int *array, int low, int high) {
 
     int middle = (low + high) / 2;
 
+    RETURN_IF(!running);
     if (middle - low > 1) {
         clear_info();
         kprintf_at(0, LINE1)("Running mergesort from {i} to {i}", low, middle);
         wait(5 * SPEED_FACTOR);
     }
 
+    RETURN_IF(!running);
     mergesort(status, array, low, middle);
 
+    RETURN_IF(!running);
     if (high - middle - 1 > 1) {
         clear_info();
         kprintf_at(0, LINE1)("Running mergesort from {i} to {i}", middle + 1, high);
         wait(5 * SPEED_FACTOR);
     }
 
+    RETURN_IF(!running);
     mergesort(status, array, middle + 1, high);
 
+    RETURN_IF(!running);
     clear_info();
     kprintf_at(0, LINE1)("Merging {i} to {i} and {i} to {i}", low, middle, middle + 1, high);
     mark_many(status, low, middle + 1, SELECTED);
@@ -339,7 +340,9 @@ void mergesort(enum Colors *status, int *array, int low, int high) {
     render_status(status);
     wait(5 * SPEED_FACTOR);
     mark_many(status, low, high + 1, NONE);
+    RETURN_IF(!running);
     merge(array, low, middle, high);
+    RETURN_IF(!running);
 }
 
 void visualise_merge(int *array) {
@@ -350,7 +353,9 @@ void visualise_merge(int *array) {
     clear_info();
     kprintf_at(0, LINE1)("Running mergesort");
     wait(5 * SPEED_FACTOR);
+    RETURN_IF(!running);
     mergesort(status, array, 0, ARRAY_SIZE - 1);
+    RETURN_IF(!running);
     clear_info();
     kprintf_at(0, LINE1)("Done!");
     mark_many(status, 0, ARRAY_SIZE, DONE);
