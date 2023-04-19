@@ -1,14 +1,17 @@
 #include "shell.h"
+#include "../drivers/keyboard.h"
 #include "../drivers/screen.h"
 #include "../libc/function.h"
 #include "../libc/mem.h"
 #include "../libc/string.h"
+/* #include "program.h" */
+#include "scheduler.h"
 
-struct Command {
+typedef struct Command {
     const char *key;
     void (*func)(const char *input);
     const char *help;
-};
+} command;
 
 #define CMD(name) void cmd_##name(const char *input)
 #define CMDREF(name, help) \
@@ -140,24 +143,65 @@ CMD(clear) {
     clear_screen();
 }
 
-void user_input(const char *input) {
+static char key_buffer[256];
+
+static void user_input() {
     bool found = false;
     for (int i = 0; i < LEN(commands); i++) {
         int last;
         const command *cmd = &commands[i];
-        if (strbeginswith(input, cmd->key, &last)) {
-            if (input[last] == ' ') {
-                cmd->func(&input[last + 1]);
+        if (strbeginswith(key_buffer, cmd->key, &last)) {
+            if (key_buffer[last] == ' ') {
+                cmd->func(&key_buffer[last + 1]);
                 found = true;
-            } else if (input[last] == '\0') {
+            } else if (key_buffer[last] == '\0') {
                 cmd->func("");
                 found = true;
             }
         }
     }
 
+    key_buffer[0] = '\0';
+
     if (!found)
         kprintln("Invalid command.");
 
+    schedule(&print_prompt);
+}
+
+static void shell_key_handler(uint8_t scancode) {
+    static bool next_upper = false;
+
+    bool KEY_BUFFER_EMPTY = key_buffer[0] == '\0';
+
+    if (scancode == BACKSPACE) {
+        if (!KEY_BUFFER_EMPTY) {
+            backspace(key_buffer);
+            kprint_backspace();
+        }
+    } else if (scancode == ENTER) {
+        kprint("\n");
+        schedule(&user_input);
+    } else if (scancode == LSHIFT || scancode == RSHIFT) {
+        static bool next_upper = true;
+    } else {
+        char letter = get_letter(scancode, next_upper);
+        if (next_upper)
+            next_upper = false;
+
+        /* Remember that kprint only accepts char[] */
+        char str[2] = {letter, '\0'};
+        append(key_buffer, letter);
+        kprint(str);
+    }
+}
+
+void init_shell() {
+    kprintln("Type something, it will go through the kernel");
+    kprintln("Type help for a list of commands");
+    kprintln("Type end to halt the CPU");
+
     print_prompt();
+
+    key_handler = &shell_key_handler;
 }

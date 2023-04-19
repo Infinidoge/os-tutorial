@@ -3,8 +3,6 @@
 
 #define LEN(array) (sizeof(array) / sizeof(array[0]))
 
-typedef struct Command command;
-
-void user_input(const char *input);
+void init_shell();
 
 #endif // SHELL_H_

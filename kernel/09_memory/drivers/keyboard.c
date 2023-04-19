@@ -6,13 +6,6 @@
 #include "../libc/string.h"
 #include "screen.h"
 
-#define BACKSPACE 14
-#define ENTER 28
-#define LSHIFT 42
-#define RSHIFT 54
-
-static char key_buffer[256];
-
 #define SC_MAX 57
 const char *sc_name[] = {
     "ERROR",
@@ -197,45 +190,45 @@ const char sc_upper[] = {
     ' ',
 };
 
-bool next_upper = false;
-
-static char get_letter(int scancode) {
-    if (next_upper) {
-        next_upper = false;
-        return sc_upper[scancode];
-    } else {
-        return sc_lower[scancode];
+const int get_scancode(const char *name) {
+    for (int i = 1; i < LEN(sc_name); i++) {
+        if (strcmp(sc_name[i], name))
+            return i;
     }
+
+    kprintln("ERROR: get_scancode on invalid scancode name");
+    asm volatile("hlt");
+    return -1;
 }
 
-#define KEY_BUFFER_EMPTY (key_buffer[0] == '\0')
+char get_letter(int scancode, bool upper) {
+    return (upper ? sc_upper : sc_lower)[scancode];
+}
+
+static void empty_handler(uint8_t scancode){};
+
+keyhandler key_handler = &empty_handler;
+
+keyhandler swap_key_handler(keyhandler new_handler) {
+    keyhandler current = key_handler;
+    key_handler = new_handler;
+    return current;
+}
+
+void return_key_handler(keyhandler new_handler) {
+    key_handler = new_handler;
+}
 
 static void keyboard_callback(registers_t regs) {
+    UNUSED(regs);
+
     /* The PIC leaves us the scancode in port 0x60 */
     uint8_t scancode = port_byte_in(0x60);
 
     if (scancode > SC_MAX)
         return;
-    if (scancode == BACKSPACE) {
-        if (!KEY_BUFFER_EMPTY) {
-            backspace(key_buffer);
-            kprint_backspace();
-        }
-    } else if (scancode == ENTER) {
-        kprint("\n");
-        user_input(key_buffer); /* kernel-controlled function */
-        key_buffer[0] = '\0';
-    } else if (scancode == LSHIFT || scancode == RSHIFT) {
-        next_upper = true;
-    } else {
-        char letter = get_letter(scancode);
 
-        /* Remember that kprint only accepts char[] */
-        char str[2] = {letter, '\0'};
-        append(key_buffer, letter);
-        kprint(str);
-    }
-    UNUSED(regs);
+    (*key_handler)(scancode);
 }
 
 void init_keyboard() {
