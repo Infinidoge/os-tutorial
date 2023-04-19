@@ -21,6 +21,7 @@ CMD(end);
 CMD(test);
 CMD(page);
 CMD(alloc);
+/* CMD(program); */
 CMD(memory);
 CMD(help);
 CMD(echo);
@@ -31,6 +32,7 @@ const command commands[] = {
     CMDREF(test, "Runs whatever test code is currently in place"),
     CMDREF(page, "Allocates a page of memory and prints the address to it"),
     CMDREF(alloc, "Allocates a single node of memory"),
+    /* CMDREF(program, "Runs the program"), */
     CMDREF(memory, "Prints out the current status of main memory"),
     CMDREF(help, "Prints a list of commands with help text"),
     CMDREF(echo, "Echos the input back to you"),
@@ -119,6 +121,11 @@ CMD(alloc) {
 
     count++;
 }
+
+/* CMD(program) { */
+/*     UNUSED(input); */
+/*     schedule(&program); */
+/* } */
 
 CMD(memory) {
     UNUSED(input);
