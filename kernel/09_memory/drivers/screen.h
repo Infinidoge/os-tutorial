@@ -7,6 +7,9 @@
 #define VIDEO_ADDRESS 0xb8000
 #define MAX_ROWS 25
 #define MAX_COLS 80
+#define SCREEN_SIZE (MAX_COLS * MAX_ROWS)
+#define SCREEN_SIZE_BYTES (2 * SCREEN_SIZE)
+
 #define WHITE_ON_BLACK 0x0f
 #define BLACK_ON_WHITE 0xf0
 #define RED_ON_WHITE 0xf4
@@ -28,6 +31,20 @@ void kprintlnf(const char *format, ...);
 void kprint_backspace();
 void paint(char c, char attr, int col, int row);
 void paint_rect(char c, char attr, int origin_col, int origin_row, int width, int height, bool fill);
+void copy_screen_to(uint8_t *address);
+void copy_screen_from(uint8_t *address);
+int get_cursor_offset();
+void set_cursor_offset(int offset);
+int get_offset(int col, int row);
+int get_offset_row(int offset);
+int get_offset_col(int offset);
+
+typedef struct ScreenState {
+    uint8_t video_memory[SCREEN_SIZE_BYTES];
+    int offset;
+} screenstate;
+void save_screen_to(screenstate *state);
+void load_screen_from(screenstate *state);
 
 /* Utilities for the shell */
 #define PROMPT "> "

@@ -2,6 +2,9 @@
 #include "../cpu/ports.h"
 #include "../libc/mem.h"
 #include <stdarg.h>
+#include <stdint.h>
+
+uint8_t *video_memory = (uint8_t *)VIDEO_ADDRESS;
 
 /* Declaration of private functions */
 int get_cursor_offset();
@@ -143,24 +146,22 @@ void print_prompt() {
  * Raw screen painting function
  */
 void paint(char c, char attr, int col, int row) {
-    uint8_t *vidmem = (uint8_t *)VIDEO_ADDRESS;
-
     if (OFF_SCREEN(col, row)) {
-        vidmem[2 * (MAX_COLS) * (MAX_ROWS)-2] = 'E';
-        vidmem[2 * (MAX_COLS) * (MAX_ROWS)-1] = RED_ON_WHITE;
+        video_memory[SCREEN_SIZE_BYTES - 2] = 'E';
+        video_memory[SCREEN_SIZE_BYTES - 1] = RED_ON_WHITE;
         return;
     }
 
     int offset = get_offset(col, row);
 
-    vidmem[offset] = c;
-    vidmem[offset + 1] = attr;
+    video_memory[offset] = c;
+    video_memory[offset + 1] = attr;
 }
 
 #define ON_RECT_EDGE col == 0 || col == (width - 1) || row == 0 || row == (height - 1)
 
 void paint_rect(char c, char attr, int origin_col, int origin_row, int width, int height, bool fill) {
-    if (OFF_SCREEN(origin_col, origin_row) || OFF_SCREEN(origin_col + width, origin_row + height)) {
+    if (OFF_SCREEN(origin_col, origin_row) || OFF_SCREEN(origin_col + width - 1, origin_row + height - 1)) {
         paint('E', RED_ON_WHITE, MAX_COLS - 1, MAX_ROWS - 1);
         return;
     }
@@ -182,6 +183,34 @@ void paint_rect(char c, char attr, int origin_col, int origin_row, int width, in
  * Private kernel functions                               *
  **********************************************************/
 
+enum Specifier { NONE, INVALID, STRING, INT, HEX };
+
+enum Specifier check_specifier(const int index, const char *string) {
+    int len = strlen(string);
+
+    if (len < 2 || string[index] != '}')
+        return NONE;
+
+    if (string[index - 1] == '{')
+        return STRING;
+
+    if (len < 3)
+        return NONE;
+
+    if (string[index - 2] == '{') {
+        switch (string[index - 1]) {
+        case 'i':
+            return INT;
+        case 'x':
+            return HEX;
+        default:
+            return INVALID;
+        }
+    }
+
+    return INVALID;
+}
+
 void vkprintf(const char *format, va_list ptr) {
     int last = 0;
 
@@ -189,10 +218,38 @@ void vkprintf(const char *format, va_list ptr) {
         if (i == 0)
             continue;
 
-        if (format[i - 1] == '{' && format[i] == '}') {
+        switch (check_specifier(i, format)) {
+        case NONE:
+            break;
+        case INVALID:
+            kprint_until(&format[last], '{');
+            kprint("{INVALID SPECIFIER}");
+            va_arg(ptr, void *);
+            last = i + 1;
+            break;
+        case STRING:
             kprint_until(&format[last], '{');
             kprint(va_arg(ptr, char *));
             last = i + 1;
+            break;
+        case INT:
+            kprint_until(&format[last], '{');
+            {
+                char tmp[16];
+                int_to_ascii(va_arg(ptr, int), tmp);
+                kprint(tmp);
+            }
+            last = i + 1;
+            break;
+        case HEX:
+            kprint_until(&format[last], '{');
+            {
+                char tmp[16];
+                hex_to_ascii(va_arg(ptr, int), tmp);
+                kprint(tmp);
+            }
+            last = i + 1;
+            break;
         }
     }
     kprint(&format[last]);
@@ -207,14 +264,13 @@ void vkprintf(const char *format, va_list ptr) {
  * Sets the video cursor to the returned offset
  */
 int print_char(char c, int col, int row, char attr) {
-    uint8_t *vidmem = (uint8_t *)VIDEO_ADDRESS;
     if (!attr)
         attr = WHITE_ON_BLACK;
 
     /* Error control: print a red 'E' if the coords aren't right */
     if (col >= MAX_COLS || row >= MAX_ROWS) {
-        vidmem[2 * (MAX_COLS) * (MAX_ROWS)-2] = 'E';
-        vidmem[2 * (MAX_COLS) * (MAX_ROWS)-1] = RED_ON_WHITE;
+        video_memory[SCREEN_SIZE_BYTES - 2] = 'E';
+        video_memory[SCREEN_SIZE_BYTES - 1] = RED_ON_WHITE;
         return get_offset(col, row);
     }
 
@@ -228,23 +284,22 @@ int print_char(char c, int col, int row, char attr) {
         row = get_offset_row(offset);
         offset = get_offset(0, row + 1);
     } else if (c == 0x08) { /* Backspace */
-        vidmem[offset] = ' ';
-        vidmem[offset + 1] = attr;
+        video_memory[offset] = ' ';
+        video_memory[offset + 1] = attr;
     } else {
-        vidmem[offset] = c;
-        vidmem[offset + 1] = attr;
+        video_memory[offset] = c;
+        video_memory[offset + 1] = attr;
         offset += 2;
     }
 
     /* Check if the offset is over screen size and scroll */
-    if (offset >= MAX_ROWS * MAX_COLS * 2) {
+    if (offset >= SCREEN_SIZE_BYTES) {
         int i;
         for (i = 1; i < MAX_ROWS; i++)
-            memory_copy((uint8_t *)(get_offset(0, i) + VIDEO_ADDRESS),
-                (uint8_t *)(get_offset(0, i - 1) + VIDEO_ADDRESS), MAX_COLS * 2);
+            memory_copy(video_memory + get_offset(0, i), video_memory + get_offset(0, i - 1), MAX_COLS * 2);
 
         /* Blank last line */
-        char *last_line = (char *)(get_offset(0, MAX_ROWS - 1) + (uint8_t *)VIDEO_ADDRESS);
+        char *last_line = (char *)(video_memory + get_offset(0, MAX_ROWS - 1));
         for (i = 0; i < MAX_COLS * 2; i++)
             last_line[i] = 0;
 
@@ -277,13 +332,9 @@ void set_cursor_offset(int offset) {
 }
 
 void clear_screen() {
-    int screen_size = MAX_COLS * MAX_ROWS;
-    int i;
-    uint8_t *screen = (uint8_t *)VIDEO_ADDRESS;
-
-    for (i = 0; i < screen_size; i++) {
-        screen[i * 2] = ' ';
-        screen[i * 2 + 1] = WHITE_ON_BLACK;
+    for (int i = 0; i < SCREEN_SIZE; i++) {
+        video_memory[i * 2] = ' ';
+        video_memory[i * 2 + 1] = WHITE_ON_BLACK;
     }
     set_cursor_offset(get_offset(0, 0));
 }
@@ -296,4 +347,22 @@ int get_offset_row(int offset) {
 }
 int get_offset_col(int offset) {
     return (offset - (get_offset_row(offset) * 2 * MAX_COLS)) / 2;
+}
+
+void copy_screen_to(uint8_t *address) {
+    memory_copy(video_memory, address, SCREEN_SIZE_BYTES);
+}
+
+void copy_screen_from(uint8_t *address) {
+    memory_copy(address, video_memory, SCREEN_SIZE_BYTES);
+}
+
+void save_screen_to(screenstate *state) {
+    copy_screen_to(state->video_memory);
+    state->offset = get_cursor_offset();
+}
+
+void load_screen_from(screenstate *state) {
+    copy_screen_from(state->video_memory);
+    set_cursor_offset(state->offset);
 }
