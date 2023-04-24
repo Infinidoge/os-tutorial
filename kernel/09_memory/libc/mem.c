@@ -237,6 +237,29 @@ node *clone_list(node *list) {
 static node *allocated = NULL;
 static node *free = NULL;
 
+void merge_with_next(node *selected) {
+    if (selected == NULL || selected->next == NULL)
+        return;
+
+    if ((selected->address + selected->size) == selected->next->address) {
+        selected->size += selected->next->size;
+        selected->next = selected->next->next;
+        if (selected->next != NULL)
+            selected->next->prev = selected;
+    }
+}
+
+void merge_free() {
+    node *current = free;
+    while (current != NULL) {
+        node *pre_merge_next = current->next;
+        merge_with_next(current);
+
+        if (current->next == pre_merge_next)
+            current = current->next;
+    }
+}
+
 const size_t FREE_MEM_START = 0x10000;
 const size_t FREE_MEM_END = 0x40000;
 
@@ -302,7 +325,6 @@ size_t kcalloc(size_t n, size_t size);
 
 size_t krealloc(size_t address, size_t size, bool align, size_t align_size);
 
-void merge_free() {}
 
 void kfree(size_t address) {
     node *target = find(allocated, address);
@@ -312,23 +334,7 @@ void kfree(size_t address) {
     allocated = delete_by_address(allocated, address);
     free = add_new(free, address, target->size);
 
-    // Merge free together; Unfinished
-    /* node *current = free; */
-    /* while (current->next != NULL) { */
-    /*     if ((current->address + current->size) == current->next->address) { */
-    /*         current->size += current->next->size; */
-    /*         current = delete_by_address(current, current->next->address); */
-    /*     } */
-
-    /*     current = current->next; */
-    /* } */
-
-    /* node *head = current; */
-    /* while (head->prev != NULL) { */
-    /*     head = head->prev; */
-    /* } */
-
-    /* free = head; */
+    merge_free();
 }
 
 void print_memory() {
