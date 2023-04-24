@@ -20,7 +20,7 @@ void memory_set(uint8_t *dest, uint8_t val, uint32_t len) {
 ////////// Naive Allocator //////////
 
 size_t kmalloc_naive(size_t size, bool align, size_t *phys_addr) {
-    static size_t free_mem_addr = END;
+    static size_t free_mem_addr = 0x1000;
 
     if (align && (free_mem_addr & 0xFFF)) {
         free_mem_addr &= 0xFFFFF000;
