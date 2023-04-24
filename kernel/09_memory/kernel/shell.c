@@ -23,6 +23,8 @@ CMD(test);
 /* CMD(program); */
 CMD(visualise);
 CMD(memory);
+CMD(memory_info);
+CMD(memory_map);
 CMD(colors);
 CMD(help);
 CMD(echo);
@@ -34,6 +36,8 @@ const command commands[] = {
     /* CMDREF(program, "Runs the program"), */
     CMDREF(visualise, "Runs the visualiser"),
     CMDREF(memory, "Prints out the current status of main memory"),
+    CMDREF(memory_info, "Prints out the current status of main memory"),
+    CMDREF(memory_map, "Prints out a map of main memory"),
     CMDREF(colors, "Prints out all of the colors, with color codes"),
     CMDREF(help, "Prints a list of commands with help text"),
     CMDREF(echo, "Echos the input back to you"),
@@ -74,6 +78,16 @@ CMD(memory) {
     UNUSED(input);
 
     print_memory();
+    memory_map();
+}
+
+CMD(memory_info) {
+    UNUSED(input);
+    print_memory();
+}
+
+CMD(memory_map) {
+    UNUSED(input);
     memory_map();
 }
 
