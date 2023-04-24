@@ -12,5 +12,5 @@ void _start() {
     }
     register_interrupt_handler(IRQ0, irq_demonstration);
 
-    __asm__ __volatile__("int $32");
+    asm volatile("int $32");
 }

@@ -13,7 +13,7 @@ u8 port_byte_in (u16 port) {
      *
      * Inputs and outputs are separated by colons
      */
-    __asm__("in %%dx, %%al" : "=a" (result) : "d" (port));
+    asm("in %%dx, %%al" : "=a" (result) : "d" (port));
     return result;
 }
 
@@ -23,15 +23,15 @@ void port_byte_out (u16 port, u8 data) {
      * However we see a comma since there are two variables in the input area
      * and none in the 'return' area
      */
-    __asm__ __volatile__("out %%al, %%dx" : : "a" (data), "d" (port));
+    asm volatile("out %%al, %%dx" : : "a" (data), "d" (port));
 }
 
 u16 port_word_in (u16 port) {
     u16 result;
-    __asm__("in %%dx, %%ax" : "=a" (result) : "d" (port));
+    asm("in %%dx, %%ax" : "=a" (result) : "d" (port));
     return result;
 }
 
 void port_word_out (u16 port, u16 data) {
-    __asm__ __volatile__("out %%ax, %%dx" : : "a" (data), "d" (port));
+    asm volatile("out %%ax, %%dx" : : "a" (data), "d" (port));
 }
