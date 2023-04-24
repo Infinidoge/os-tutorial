@@ -6,7 +6,7 @@
 #include "../libc/mem.h"
 #include "shell.h"
 
-#define SPEED_FACTOR 100
+#define SPEED_FACTOR 75
 
 #define ARRAY_SIZE 20
 #define BAR_WIDTH (MAX_COLS / ARRAY_SIZE)
