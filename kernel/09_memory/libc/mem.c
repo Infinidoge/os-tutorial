@@ -352,8 +352,8 @@ void print_memory() {
 
     kprintlnf("Number of allocations: {i}", length(allocated));
     kprintlnf("Number of free gaps: {i}", length(free));
-    kprintlnf("Start of Memory: {i}", FREE_MEM_START);
-    kprintlnf("End of Memory: {i}", FREE_MEM_END - 1);
+    kprintlnf("Start of Memory: {x}", FREE_MEM_START);
+    kprintlnf("End of Memory: {x}", FREE_MEM_END - 1);
 }
 
 void memory_map() {
