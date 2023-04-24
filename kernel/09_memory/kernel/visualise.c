@@ -145,18 +145,23 @@ void visualise_insertion(int *array) {
             status[j] = SELECTED;
             status[j - 1] = SELECTED;
             render_status(status);
+            status[j] = NONE;
+            status[j - 1] = NONE;
 
             kprintf_at(0, LINE2)("Comparing positions {i} and {i}", j - 1, j);
 
             wait(5 * SPEED_FACTOR);
             if (array[j - 1] > array[j]) {
-                kprintf_at(0, LINE3)("Swapping", j - 1, j);
+                kprintf_at(0, LINE3)("Swapping");
                 swap(array, j, j - 1);
+                wait(5 * SPEED_FACTOR);
+                render_array(array, ARRAY_STARTING_ROW);
+            } else {
+                kprintf_at(0, LINE3)("Finished inserting element, continuing");
+                render_status(status);
+                wait(5 * SPEED_FACTOR);
+                break;
             }
-
-            render_array(array, ARRAY_STARTING_ROW);
-            status[j] = NONE;
-            status[j - 1] = NONE;
         }
 
         status[i] = NONE;
