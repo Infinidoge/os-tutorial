@@ -52,6 +52,43 @@ CMD(end) {
 
 CMD(test) {
     UNUSED(input);
+
+    static size_t pointer1;
+    static size_t pointer2;
+    static size_t pointer3;
+    static size_t pointer4;
+    static size_t pointer5;
+    static size_t pointer6;
+
+    static int count = 0;
+    if (count == 0) {
+        pointer1 = kmalloc(1024);
+        pointer2 = kcalloc(10, 8);
+        pointer3 = kmalloc(1024);
+        pointer4 = kmalloc(1024);
+        pointer5 = kmalloc(1024);
+        pointer6 = kmalloc(1024);
+    } else if (count == 1) {
+        kfree(pointer6);
+        memory_map();
+    } else if (count == 2) {
+        kfree(pointer2);
+        memory_map();
+    } else if (count == 3) {
+        kfree(pointer5);
+        memory_map();
+    } else if (count == 4) {
+        kfree(pointer4);
+        memory_map();
+    } else if (count == 5) {
+        kfree(pointer1);
+        memory_map();
+    } else if (count == 6) {
+        kfree(pointer3);
+        memory_map();
+    }
+
+    count++;
 }
 
 /* CMD(program) { */
