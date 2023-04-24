@@ -321,7 +321,9 @@ size_t kmalloc(size_t size, bool align, size_t align_size, enum FitType fit) {
     return address;
 }
 
-size_t kcalloc(size_t n, size_t size);
+size_t kcalloc(size_t n, size_t size) {
+    return kmalloc(n * size);
+}
 
 size_t krealloc(size_t address, size_t size, bool align, size_t align_size);
 
