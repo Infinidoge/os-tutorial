@@ -35,7 +35,7 @@ const command commands[] = {
     CMDREF(test, "Runs whatever test code is currently in place"),
     /* CMDREF(program, "Runs the program"), */
     CMDREF(visualise, "Runs the visualiser"),
-    CMDREF(memory, "Prints out the current status of main memory"),
+    CMDREF(memory, "Prints out the current status and a map of main memory"),
     CMDREF(memory_info, "Prints out the current status of main memory"),
     CMDREF(memory_map, "Prints out a map of main memory"),
     CMDREF(colors, "Prints out all of the colors, with color codes"),
