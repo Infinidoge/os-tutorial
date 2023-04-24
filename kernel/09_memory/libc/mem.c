@@ -262,20 +262,23 @@ void merge_free() {
 
 const size_t FREE_MEM_START = 0x10000;
 const size_t FREE_MEM_END = 0x40000;
+const bool ALIGN = true;
+const size_t ALIGN_SIZE = 0x1000;
+const enum FitType FIT_TYPE = BEST;
 
 void init_memory() {
     free = create_node(FREE_MEM_START, FREE_MEM_END - FREE_MEM_START);
 }
 
-size_t kmalloc(size_t size, bool align, size_t align_size, enum FitType fit) {
-    if (align && (size % align_size != 0)) {
-        size += align_size - (size % align_size);
+size_t kmalloc(size_t size) {
+    if (ALIGN && (size % ALIGN_SIZE != 0)) {
+        size += ALIGN_SIZE - (size % ALIGN_SIZE);
     }
 
     node *free_target;
     node *current;
 
-    switch (fit) {
+    switch (FIT_TYPE) {
     case FIRST:
         free_target = free;
         break;

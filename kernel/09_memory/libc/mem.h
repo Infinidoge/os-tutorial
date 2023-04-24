@@ -21,7 +21,7 @@ void init_memory();
 
 enum FitType { FIRST, BEST, WORST };
 
-size_t kmalloc(size_t size, bool align, size_t align_size, enum FitType fit);
+size_t kmalloc(size_t size);
 size_t kcalloc(size_t n, size_t size);
 void kfree(size_t address);
 
