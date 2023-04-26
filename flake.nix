@@ -64,7 +64,7 @@
                     program = lib.getExe ivalue;
                   };
                 })
-                value) // { ${name} = self.apps.${system}."${name}-curses"; }
+                (builtins.removeAttrs value [ "override" "overrideDerivation" ])) // { ${name} = self.apps.${system}."${name}-curses"; }
               );
 
             kernelApps = lib.concatMapAttrs kernelAppsFunction kernelAppsPre;
