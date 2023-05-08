@@ -46,8 +46,8 @@ const command commands[] = {
 
 CMD(end) {
     UNUSED(input);
-    kprint("Stopping the CPU. Bye!\n");
-    asm volatile("hlt");
+    kprint("Exiting. Bye!\n");
+    schedule(&stop);
 }
 
 CMD(test) {
@@ -207,7 +207,7 @@ static void shell_key_handler(uint8_t scancode) {
 void init_shell() {
     kprintln("Type something, it will go through the kernel");
     kprintln("Type help for a list of commands");
-    kprintln("Type end to halt the CPU");
+    kprintln("Type end to exit");
 
     print_prompt();
 

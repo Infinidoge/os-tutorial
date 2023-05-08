@@ -6,5 +6,6 @@ typedef void (*schedulable)();
 void schedule(schedulable);
 
 void run_scheduler();
+void stop();
 
 #endif // SCHEDULER_H_

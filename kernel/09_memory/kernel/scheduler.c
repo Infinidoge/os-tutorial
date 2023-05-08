@@ -4,6 +4,7 @@
 
 schedulable scheduled[256];
 
+static bool is_active = true;
 static uint8_t current, running = 0;
 
 void schedule(schedulable program) {
@@ -12,10 +13,14 @@ void schedule(schedulable program) {
 }
 
 void run_scheduler() {
-    while (true) {
+    while (is_active) {
         if (running != current && scheduled[running] != NULL) {
             /* kprintlnf("Running {i}", running); */
             (*scheduled[running++])();
         }
     }
+}
+
+void stop() {
+    is_active = false;
 }

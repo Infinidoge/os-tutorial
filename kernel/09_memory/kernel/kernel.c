@@ -15,4 +15,7 @@ void _start() {
     init_shell();
 
     run_scheduler();
+
+    asm volatile("cli");
+    asm volatile("hlt");
 }
