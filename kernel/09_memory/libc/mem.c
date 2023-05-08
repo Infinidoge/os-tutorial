@@ -40,8 +40,8 @@ size_t kmalloc_naive(size_t size, bool align, size_t *phys_addr) {
 #define NEXT(node) node = node->next
 #define PREV(node) node = node->prev
 
-node *create_node(size_t address, size_t size) {
-    node *new_node = (node *)kmalloc_naive(sizeof(node), false, NULL);
+memorynode *create_node(size_t address, size_t size) {
+    memorynode *new_node = (memorynode *)kmalloc_naive(sizeof(memorynode), false, NULL);
     new_node->address = address;
     new_node->size = size;
     new_node->prev = new_node->next = NULL;
@@ -49,7 +49,7 @@ node *create_node(size_t address, size_t size) {
     return new_node;
 }
 
-node *insert_after(node *head, node *new) {
+memorynode *insert_after(memorynode *head, memorynode *new) {
     if (head->next != NULL) {
         new->next = head->next;
         new->next->prev = new;
@@ -61,7 +61,7 @@ node *insert_after(node *head, node *new) {
     return head;
 }
 
-node *insert_before(node *head, node *new) {
+memorynode *insert_before(memorynode *head, memorynode *new) {
     if (head->prev != NULL) {
         new->prev = head->prev;
         new->prev->next = new;
@@ -73,8 +73,8 @@ node *insert_before(node *head, node *new) {
     return new;
 }
 
-node *find(node *list, size_t address) {
-    node *current = list;
+memorynode *find(memorynode *list, size_t address) {
+    memorynode *current = list;
 
     while (current != NULL && current->address != address) {
         current = current->next;
@@ -83,30 +83,30 @@ node *find(node *list, size_t address) {
     return current;
 }
 
-node *head(node *list) {
+memorynode *head(memorynode *list) {
     if (list == NULL)
         return NULL;
 
-    node *current = list;
+    memorynode *current = list;
     while (current->prev != NULL)
         current = current->prev;
 
     return current;
 }
 
-node *tail(node *list) {
+memorynode *tail(memorynode *list) {
     if (list == NULL)
         return NULL;
 
-    node *current = list;
+    memorynode *current = list;
     while (current->next != NULL)
         current = current->next;
 
     return current;
 }
 
-node *delete_by_address(node *list, size_t address) {
-    node *target = find(list, address);
+memorynode *delete_by_address(memorynode *list, size_t address) {
+    memorynode *target = find(list, address);
 
     if (target == NULL)
         return list;
@@ -123,14 +123,14 @@ node *delete_by_address(node *list, size_t address) {
         return list;
 }
 
-node *insert_by_address(node *sorted, node *new_node) {
+memorynode *insert_by_address(memorynode *sorted, memorynode *new_node) {
     if (sorted == NULL) {
         new_node->prev = new_node->next = NULL;
         return new_node;
     } else if (sorted->address >= new_node->address) {
         return insert_before(sorted, new_node);
     } else {
-        node *current = sorted;
+        memorynode *current = sorted;
         while (current->next != NULL && current->next->address < new_node->address) {
             current = current->next;
         }
@@ -141,11 +141,11 @@ node *insert_by_address(node *sorted, node *new_node) {
     }
 }
 
-node *sort_by_address(node *list) {
+memorynode *sort_by_address(memorynode *list) {
     // Implemented via insertion sort
-    node *sorted = NULL;
-    node *current = list;
-    node *next = NULL;
+    memorynode *sorted = NULL;
+    memorynode *current = list;
+    memorynode *next = NULL;
 
     while (current != NULL) {
         next = current->next;
@@ -160,14 +160,14 @@ node *sort_by_address(node *list) {
 
 #define IFASCENDING(left, op, right) ((ascending && left op right) || right op left)
 
-node *insert_by_size(node *sorted, node *new_node, bool ascending) {
+memorynode *insert_by_size(memorynode *sorted, memorynode *new_node, bool ascending) {
     if (sorted == NULL) {
         new_node->prev = new_node->next = NULL;
         return new_node;
     } else if IFASCENDING (sorted->size, >=, new_node->size) {
         return insert_before(sorted, new_node);
     } else {
-        node *current = sorted;
+        memorynode *current = sorted;
         while (current->next != NULL && IFASCENDING(current->next->size, <, new_node->size)) {
             current = current->next;
         }
@@ -180,11 +180,11 @@ node *insert_by_size(node *sorted, node *new_node, bool ascending) {
 
 #undef IFASCENDING
 
-node *sort_by_size(node *list, bool ascending) {
+memorynode *sort_by_size(memorynode *list, bool ascending) {
     // Implemented via insertion sort
-    node *sorted = NULL;
-    node *current = list;
-    node *next = NULL;
+    memorynode *sorted = NULL;
+    memorynode *current = list;
+    memorynode *next = NULL;
 
     while (current != NULL) {
         next = current->next;
@@ -197,21 +197,21 @@ node *sort_by_size(node *list, bool ascending) {
     return sorted;
 }
 
-node *add_new(node *list, size_t address, size_t size) {
+memorynode *add_new(memorynode *list, size_t address, size_t size) {
     return insert_by_address(list, create_node(address, size));
 }
 
-void resize(node *list, size_t address, size_t size) {
-    node *target = find(list, address);
+void resize(memorynode *list, size_t address, size_t size) {
+    memorynode *target = find(list, address);
 
     if (target != NULL)
         target->size = size;
 }
 
-size_t length(node *list) {
+size_t length(memorynode *list) {
     int length = 0;
 
-    node *current = list;
+    memorynode *current = list;
     while (current != NULL) {
         length++;
         current = current->next;
@@ -220,10 +220,10 @@ size_t length(node *list) {
     return length;
 }
 
-node *clone_list(node *list) {
-    node *new_list;
+memorynode *clone_list(memorynode *list) {
+    memorynode *new_list;
 
-    node *current = list;
+    memorynode *current = list;
     while (current != NULL) {
         new_list = add_new(new_list, current->address, current->size);
         current = current->next;
@@ -234,10 +234,10 @@ node *clone_list(node *list) {
 
 ///////// alloc implementation //////////
 
-static node *allocated = NULL;
-static node *free = NULL;
+static memorynode *allocated = NULL;
+static memorynode *free = NULL;
 
-void merge_with_next(node *selected) {
+void merge_with_next(memorynode *selected) {
     if (selected == NULL || selected->next == NULL)
         return;
 
@@ -250,9 +250,9 @@ void merge_with_next(node *selected) {
 }
 
 void merge_free() {
-    node *current = free;
+    memorynode *current = free;
     while (current != NULL) {
-        node *pre_merge_next = current->next;
+        memorynode *pre_merge_next = current->next;
         merge_with_next(current);
 
         if (current->next == pre_merge_next)
@@ -275,8 +275,8 @@ size_t kmalloc(size_t size) {
         size += ALIGN_SIZE - (size % ALIGN_SIZE);
     }
 
-    node *free_target;
-    node *current;
+    memorynode *free_target;
+    memorynode *current;
 
     switch (FIT_TYPE) {
     case FIRST:
@@ -331,7 +331,7 @@ size_t kcalloc(size_t n, size_t size) {
 size_t krealloc(size_t address, size_t size);
 
 void kfree(size_t address) {
-    node *target = find(allocated, address);
+    memorynode *target = find(allocated, address);
     if (target == NULL)
         return;
 
@@ -345,7 +345,7 @@ void print_memory() {
     kprintlnf("Total Physical Memory: {i}kb", (FREE_MEM_END - FREE_MEM_START) / 1024);
 
     int free_total = 0;
-    node *current = free;
+    memorynode *current = free;
     while (current != NULL) {
         free_total += current->size;
         current = current->next;
@@ -369,8 +369,8 @@ void print_memory() {
 void memory_map() {
     kprintln("Memory Map:");
 
-    node *current_allocated = allocated;
-    node *current_free = free;
+    memorynode *current_allocated = allocated;
+    memorynode *current_free = free;
 
     while (current_allocated != NULL || current_free != NULL) {
         if (current_free == NULL || current_allocated->address < current_free->address) {

@@ -25,26 +25,26 @@ size_t kmalloc(size_t size);
 size_t kcalloc(size_t n, size_t size);
 void kfree(size_t address);
 
-typedef struct Node {
+typedef struct MemoryNode {
     size_t address;
     size_t size;
-    struct Node *next;
-    struct Node *prev;
-} node;
+    struct MemoryNode *next;
+    struct MemoryNode *prev;
+} memorynode;
 
-node *create_node(size_t address, size_t size);
+memorynode *create_memorynode(size_t address, size_t size);
 
 // All functions that manipulate the list in some way return the head of the list
 // This is necessary in case the head of the list changes after insertion, deletion, etc.
 // Would otherwise require a lot of indirection or manual re-finding of the head of the list
-node *insert_after(node *target, node *new);
-node *insert_before(node *target, node *new);
-node *add_new(node *list, size_t address, size_t size);
-node *sort_by_address(node *list);
-node *sort_by_size(node *list, bool ascending);
-node *delete_by_address(node *list, size_t address);
+memorynode *insert_after(memorynode *target, memorynode *new);
+memorynode *insert_before(memorynode *target, memorynode *new);
+memorynode *add_new(memorynode *list, size_t address, size_t size);
+memorynode *sort_by_address(memorynode *list);
+memorynode *sort_by_size(memorynode *list, bool ascending);
+memorynode *delete_by_address(memorynode *list, size_t address);
 
-node *find(node *list, size_t address);
+memorynode *find(memorynode *list, size_t address);
 
 void print_memory();
 void memory_map();
