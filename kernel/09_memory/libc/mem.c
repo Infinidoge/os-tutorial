@@ -81,7 +81,7 @@ memorynode *find(memorynode *list, size_t address) {
     return current;
 }
 
-memorynode *head(memorynode *list) {
+static memorynode *head(memorynode *list) {
     if (list == NULL)
         return NULL;
 
@@ -92,7 +92,7 @@ memorynode *head(memorynode *list) {
     return current;
 }
 
-memorynode *tail(memorynode *list) {
+static memorynode *tail(memorynode *list) {
     if (list == NULL)
         return NULL;
 
