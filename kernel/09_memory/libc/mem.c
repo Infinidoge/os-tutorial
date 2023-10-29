@@ -1,5 +1,6 @@
 #include "mem.h"
 #include "../drivers/screen.h"
+#include "linkedlist.h"
 #include "meta.h"
 #include "string.h"
 
@@ -36,9 +37,6 @@ size_t kmalloc_naive(size_t size, bool align, size_t *phys_addr) {
 }
 
 ///////// Linked List Implementation //////////
-
-#define NEXT(node) node = node->next
-#define PREV(node) node = node->prev
 
 memorynode *create_node(size_t address, size_t size) {
     memorynode *new_node = (memorynode *)kmalloc_naive(sizeof(memorynode), false, NULL);
