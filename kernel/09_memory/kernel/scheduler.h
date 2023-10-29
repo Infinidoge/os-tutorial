@@ -1,7 +1,9 @@
 #ifndef SCHEDULER_H_
 #define SCHEDULER_H_
 
-typedef void (*schedulable)();
+#include "../libc/function.h"
+
+typedef action0 schedulable;
 
 void schedule(schedulable);
 
