@@ -7,7 +7,7 @@
 let
   tmp = "tmp=$(mktemp -d --tmpdir cs3502-kernel.XXXX); cd $tmp";
   i386 = "${qemu}/bin/qemu-system-i386";
-  qemuArgs = "-boot order=a -drive file=os-image.bin,index=0,if=floppy,format=raw";
+  qemuArgs = "-boot order=a -drive file=os-image.bin,index=0,if=floppy,format=raw -smp 4";
 in
 {
   run = writeScriptBin "run" ''
