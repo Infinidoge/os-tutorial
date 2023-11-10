@@ -70,6 +70,38 @@ void uhex_to_ascii(unsigned int n, char str[]) {
     reverse(str);
 }
 
+void bin_to_ascii(unsigned int n, char str[]) {
+    int i = 0;
+    do {
+        str[i++] = n % 2 == 1 ? '1' : '0';
+    } while ((n >>= 1) > 0);
+
+    str[i++] = 'b';
+    str[i++] = '0';
+
+    str[i] = '\0';
+
+    reverse(str);
+}
+
+void bin_to_ascii_padded(unsigned int n, char str[], int padding) {
+    int i = 0;
+    do {
+        str[i++] = n % 2 == 1 ? '1' : '0';
+    } while ((n >>= 1) > 0);
+
+    while (i < padding) {
+        str[i++] = '0';
+    }
+
+    str[i++] = 'b';
+    str[i++] = '0';
+
+    str[i] = '\0';
+
+    reverse(str);
+}
+
 /* K&R */
 void reverse(char s[]) {
     int c, i, j;
