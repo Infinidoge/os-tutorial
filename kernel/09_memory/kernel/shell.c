@@ -1,4 +1,6 @@
 #include "shell.h"
+#include "../cpu/info.h"
+#include "../cpu/types.h"
 #include "../drivers/keyboard.h"
 #include "../drivers/screen.h"
 #include "../libc/function.h"
@@ -25,6 +27,7 @@ CMD(visualise);
 CMD(memory);
 CMD(memory_info);
 CMD(memory_map);
+CMD(cpuid);
 CMD(colors);
 CMD(help);
 CMD(echo);
@@ -38,6 +41,7 @@ const command commands[] = {
     CMDREF(memory, "Prints out the current status and a map of main memory"),
     CMDREF(memory_info, "Prints out the current status of main memory"),
     CMDREF(memory_map, "Prints out a map of main memory"),
+    CMDREF(cpuid, "Prints out information about the CPU"),
     CMDREF(colors, "Prints out all of the colors, with color codes"),
     CMDREF(help, "Prints a list of commands with help text"),
     CMDREF(echo, "Echos the input back to you"),
@@ -89,6 +93,59 @@ CMD(memory_info) {
 CMD(memory_map) {
     UNUSED(input);
     memory_map();
+}
+
+CMD(cpuid) {
+    cpuid_registers registers;
+    if (strlen(input) == 0 || strcmp(input, "1") == 0) {
+        cpu_information information = cpu_info();
+        kprintlnf("Model: {u}", information.model);
+        kprintlnf("Family ID: {u}", information.family_id);
+
+        kprint("Processor Type: ");
+        switch (information.processor_type) {
+        case ORIGINAL_OEM:
+            kprintln("Original OEM");
+            break;
+        case INTEL_OVERDRIVE:
+            kprintln("Intel Overdrive");
+            break;
+        case DUAL_PROCESSOR:
+            kprintln("Dual Processor");
+            break;
+        case INTEL_RESERVED:
+            kprintln("Intel Reserved");
+            break;
+        }
+
+        kprintlnf("CLFLUSH Line Size: {u}", information.clflush_line_size);
+        kprintlnf("Maximum Logical Processors: {u}", information.maximum_logical_processors);
+        kprintlnf("Initial APIC ID: {u}", information.initial_apic_id);
+
+        kprintlnf("APIC: {B}", information.apic);
+        kprintlnf("SEP: {B}", information.sep);
+        kprintlnf("MMX: {B}", information.mmx);
+    } else if (strcmp(input, "0") == 0) {
+        registers = cpuid(0, 0);
+        kprintlnf("Maximum CPUID input: {x}", registers.eax);
+
+        char string[13];
+        string[0] = BYTE(registers.ebx, 0);
+        string[1] = BYTE(registers.ebx, 8);
+        string[2] = BYTE(registers.ebx, 16);
+        string[3] = BYTE(registers.ebx, 24);
+        string[4] = BYTE(registers.edx, 0);
+        string[5] = BYTE(registers.edx, 8);
+        string[6] = BYTE(registers.edx, 16);
+        string[7] = BYTE(registers.edx, 24);
+        string[8] = BYTE(registers.ecx, 0);
+        string[9] = BYTE(registers.ecx, 8);
+        string[10] = BYTE(registers.ecx, 16);
+        string[11] = BYTE(registers.ecx, 24);
+        string[12] = '\0';
+
+        kprintlnf("Manufacturer ID: {}", string);
+    }
 }
 
 CMD(colors) {
