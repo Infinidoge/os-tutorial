@@ -92,6 +92,7 @@ CMD(memory_map) {
 }
 
 CMD(colors) {
+    UNUSED(input);
     for (int i = 0; i < 16; i++) {
         paint((char)i + 48, i, i, 0);
     }
