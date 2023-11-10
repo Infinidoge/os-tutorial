@@ -183,7 +183,7 @@ void paint_rect(char c, char attr, int origin_col, int origin_row, int width, in
  * Private kernel functions                               *
  **********************************************************/
 
-enum Specifier { NONE, INVALID, STRING, INT, HEX };
+enum Specifier { NONE, INVALID, STRING, INT, UINT, HEX, BIN, BIN_8, BIN_16, BIN_32, BOOL };
 
 enum Specifier check_specifier(const int index, const char *string) {
     int len = strlen(string);
@@ -201,8 +201,20 @@ enum Specifier check_specifier(const int index, const char *string) {
         switch (string[index - 1]) {
         case 'i':
             return INT;
+        case 'u':
+            return UINT;
         case 'x':
             return HEX;
+        case 'b':
+            return BIN;
+        case '8':
+            return BIN_8;
+        case 'F':
+            return BIN_16;
+        case 'Z':
+            return BIN_32;
+        case 'B':
+            return BOOL;
         default:
             return INVALID;
         }
@@ -241,6 +253,15 @@ void vkprintf(const char *format, va_list ptr) {
             }
             last = i + 1;
             break;
+        case UINT:
+            kprint_until(&format[last], '{');
+            {
+                char tmp[16];
+                uint_to_ascii(va_arg(ptr, int), tmp);
+                kprint(tmp);
+            }
+            last = i + 1;
+            break;
         case HEX:
             kprint_until(&format[last], '{');
             {
@@ -248,6 +269,50 @@ void vkprintf(const char *format, va_list ptr) {
                 hex_to_ascii(va_arg(ptr, int), tmp);
                 kprint(tmp);
             }
+            last = i + 1;
+            break;
+        case BIN:
+            kprint_until(&format[last], '{');
+            {
+                char tmp[32];
+                bin_to_ascii(va_arg(ptr, int), tmp);
+                kprint(tmp);
+            }
+            last = i + 1;
+            break;
+        case BIN_8:
+            kprint_until(&format[last], '{');
+            {
+                char tmp[32];
+                bin_to_ascii_padded(va_arg(ptr, int), tmp, 8);
+                kprint(tmp);
+            }
+            last = i + 1;
+            break;
+        case BIN_16:
+            kprint_until(&format[last], '{');
+            {
+                char tmp[32];
+                bin_to_ascii_padded(va_arg(ptr, int), tmp, 16);
+                kprint(tmp);
+            }
+            last = i + 1;
+            break;
+        case BIN_32:
+            kprint_until(&format[last], '{');
+            {
+                char tmp[32];
+                bin_to_ascii_padded(va_arg(ptr, int), tmp, 32);
+                kprint(tmp);
+            }
+            last = i + 1;
+            break;
+        case BOOL:
+            kprint_until(&format[last], '{');
+            if (va_arg(ptr, int))
+                kprint("True");
+            else
+                kprint("False");
             last = i + 1;
             break;
         }
